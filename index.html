@@ -7,7 +7,12 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* CSS Khusus Print Thermal 80mm */
+        /* Font A Thermal (Monospace) untuk Area Preview & Cetak */
+        .thermal-font {
+            font-family: 'Courier New', Courier, monospace !important;
+        }
+
+        /* CSS Khusus Print Thermal 80mm standar browser */
         @media print {
             @page {
                 size: 80mm auto;
@@ -35,13 +40,18 @@
                 max-width: 72mm !important;
                 margin: 0 auto !important;
                 border: none !important;
-                padding: 4mm 0 !important;
+                padding: 2mm 0 !important;
                 font-weight: bold !important;
                 background: transparent !important;
             }
             .print-area * {
+                font-family: 'Courier New', Courier, monospace !important;
                 font-weight: 800 !important;
                 color: black !important;
+            }
+            /* Garis Pemisah Atas Bawah Warna Hitam Pekat */
+            .border-thermal {
+                border-color: #000000 !important;
             }
         }
     </style>
@@ -90,7 +100,7 @@
     <!-- ================= 2. DASHBOARD & FITUR CETAK ================= -->
     <div id="dashboardSection" class="hidden min-h-screen p-4 md:p-8">
         
-        <header class="max-w-6xl mx-auto bg-slate-900 text-white rounded-xl p-4 mb-6 shadow-md flex justify-between items-center no-print">
+        <header class="max-w-6xl mx-auto bg-slate-900 text-white rounded-xl p-4 mb-6 shadow-md flex flex-wrap justify-between items-center gap-4 no-print">
             <div class="flex items-center space-x-3">
                 <div class="flex items-center justify-center w-12 h-12 rounded-full bg-black border-2 border-lime-400 p-1">
                     <div class="flex items-center text-left leading-none font-black font-sans tracking-tight">
@@ -103,9 +113,15 @@
                 </div>
                 <h1 class="text-xl font-black text-sky-400">StrukPrint <span class="text-rose-500">Online</span></h1>
             </div>
-            <div class="flex items-center space-x-3">
-                <span class="bg-emerald-500 text-xs font-bold px-3 py-1.5 rounded-full text-white">SISTEM SIAP (80MM)</span>
-                <button onclick="handleLogout()" class="bg-slate-700 hover:bg-slate-800 text-xs text-white font-bold px-3 py-1.5 rounded-lg border border-slate-600 transition">
+            
+            <!-- PANEL KONEKSI BLUETOOTH PRINTER THERMAL -->
+            <div class="flex items-center space-x-2">
+                <button onclick="connectBluetoothPrinter()" id="btnConnectBT" class="bg-indigo-600 hover:bg-indigo-700 text-xs font-bold px-3 py-2 rounded-lg text-white shadow transition flex items-center space-x-1">
+                    <span>📡</span>
+                    <span id="btStatusText">Connect BT Printer (80mm)</span>
+                </button>
+                <span class="bg-emerald-500 text-xs font-bold px-3 py-2 rounded-lg text-white">SIAP (80MM)</span>
+                <button onclick="handleLogout()" class="bg-slate-700 hover:bg-slate-800 text-xs text-white font-bold px-3 py-2 rounded-lg border border-slate-600 transition">
                     Logout
                 </button>
             </div>
@@ -137,18 +153,14 @@
                             Tempelkan Bukti Transaksi
                         </h2>
                         <textarea id="rawTokenText" rows="3" placeholder="Tempelkan teks laporan transaksi di sini..." class="w-full p-2.5 border border-blue-300 rounded-lg text-xs font-mono bg-white outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-                        <p class="text-[11px] text-blue-700 font-medium">*Data Agen, ID, Nama, Daya, kWh, Harga, & Token otomatis terisi.</p>
+                        <p class="text-[11px] text-blue-700 font-medium">*Data ID, Nama, Daya, & Token otomatis terisi.</p>
                     </div>
 
                     <h2 class="text-base font-bold text-slate-900 uppercase border-b pb-2 pt-2 flex items-center">
                         <span class="bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center mr-2">2</span>
                         Edit Token PLN
                     </h2>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Kode Agen</label>
-                        <input type="text" id="inTokAgen" placeholder="-" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
+                    
                     <div>
                         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">ID PLN / No Meter</label>
                         <input type="text" id="inTokIdPel" placeholder="-" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
@@ -162,10 +174,6 @@
                         <input type="text" id="inTokDaya" placeholder="-" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Jumlah kWh</label>
-                        <input type="text" id="inTokKwh" placeholder="-" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    <div>
                         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nominal Pembelian (Rp)</label>
                         <input type="text" id="inTokNominal" placeholder="Isi nominal manual..." class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
@@ -173,20 +181,36 @@
                         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Kode Token (20 Digit)</label>
                         <input type="text" id="inTokKode" placeholder="-" class="w-full p-2.5 border border-blue-400 bg-blue-50 rounded-lg text-sm font-mono font-bold text-blue-900 outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
-                    <button onclick="window.print()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg shadow-md transition-all text-sm uppercase tracking-wider flex items-center justify-center space-x-2">
-                        <span>🖨️</span>
-                        <span>Cetak Struk Token</span>
-                    </button>
+
+                    <!-- FITUR ADD FOOTER SPECIAL OFFER TOKEN -->
+                    <div class="pt-2 border-t border-slate-200 space-y-2">
+                        <label class="block text-xs font-bold text-slate-700 uppercase">📢 Add Footer / Penawaran Spesial</label>
+                        <textarea id="inTokFooter" rows="2" placeholder="Tulis promo/info toko Anda di sini..." class="w-full p-2.5 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                        <button onclick="saveFooter('token')" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-1.5 rounded-lg text-xs uppercase tracking-wider transition">
+                            💾 SAVE Promo Token
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+                        <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg shadow-md transition-all text-xs uppercase tracking-wider flex items-center justify-center space-x-1">
+                            <span>🖨️</span>
+                            <span>Print Browser</span>
+                        </button>
+                        <button onclick="printDirectBT('token')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow-md transition-all text-xs uppercase tracking-wider flex items-center justify-center space-x-1">
+                            <span>📲</span>
+                            <span>Print Bluetooth</span>
+                        </button>
+                    </div>
                 </section>
 
                 <section class="md:col-span-7 space-y-6">
                     <div class="bg-white p-6 rounded-xl border border-slate-900 shadow-sm print-area">
                         <h3 class="text-sm font-bold text-slate-700 uppercase mb-4 no-print">Preview Struk Token PLN</h3>
-                        <div class="rounded-xl p-4 bg-gradient-to-br from-white to-slate-50 font-bold max-w-[80mm] mx-auto border border-dashed border-slate-300 md:border-none">
+                        <div class="rounded-xl p-4 bg-gradient-to-br from-white to-slate-50 thermal-font font-bold max-w-[80mm] mx-auto border border-dashed border-slate-300 md:border-none text-black">
                             
                             <!-- HEADER LOGO POINN PULSA -->
-                            <div class="flex flex-col items-center justify-center border-b pb-2 mb-3 text-center">
-                                <div class="w-16 h-16 rounded-full bg-black border-2 border-lime-400 flex items-center justify-center p-1 mb-1">
+                            <div class="flex flex-col items-center justify-center border-b-2 border-black pb-2 mb-3 text-center">
+                                <div class="w-16 h-16 rounded-full bg-black border-2 border-lime-400 flex items-center justify-center p-1 mb-1 no-print">
                                     <div class="flex items-center text-left leading-none font-black font-sans tracking-tight">
                                         <span class="text-white text-2xl font-black leading-none">P</span>
                                         <div class="flex flex-col -ml-0.5">
@@ -195,29 +219,31 @@
                                         </div>
                                     </div>
                                 </div>
-                                <span class="text-black font-black text-base block">STRUK PEMBELIAN TOKEN PLN</span>
-                                <span class="text-xs text-slate-600 block">PT. PLN (PERSERO)</span>
+                                <span class="text-black font-black text-base block uppercase">STRUK PEMBELIAN TOKEN PLN</span>
+                                <span class="text-xs text-black block">PT. PLN (PERSERO)</span>
                             </div>
 
-                            <div class="space-y-1 text-xs text-slate-800">
-                                <div class="flex justify-between"><span>KODE AGEN:</span><span id="outTokAgen">-</span></div>
+                            <div class="space-y-1 text-xs text-black">
                                 <div class="flex justify-between"><span>IDPEL/METER:</span><span id="outTokIdPel">-</span></div>
                                 <div class="flex justify-between"><span>NAMA:</span><span id="outTokNama">-</span></div>
                                 <div class="flex justify-between"><span>TARIF/DAYA:</span><span id="outTokDaya">-</span></div>
-                                <div class="flex justify-between"><span>JML KWH:</span><span id="outTokKwh">-</span></div>
                                 <div class="flex justify-between"><span>NOMINAL:</span><span id="outTokNominal">Rp -</span></div>
                             </div>
-                            <div class="py-3 my-2 border-y border-slate-300 text-center">
+                            <div class="py-3 my-2 border-y-2 border-black text-center">
                                 <span class="block text-[11px] uppercase tracking-wider">KODE TOKEN STROOM</span>
-                                <span id="outTokKode" class="font-mono text-lg font-black block tracking-widest text-slate-900 mt-1">-</span>
+                                <span id="outTokKode" class="font-mono text-lg font-black block tracking-widest text-black mt-1">-</span>
                             </div>
-                            <div class="text-center text-[10px] text-slate-600 mt-2">
+                            <div class="text-center text-[10px] text-black mt-2">
                                 Simpan struk ini sebagai bukti pembayaran yang sah.
                             </div>
 
+                            <!-- FOOTER PROMO TERKUNCI -->
+                            <div id="outTokFooter" class="mt-2 pt-2 border-t-2 border-black text-center text-xs font-bold text-black whitespace-pre-line hidden">
+                            </div>
+
                             <!-- FOOTER WAKTU CETAK INDONESIA LENGKAP -->
-                            <div class="mt-3 pt-2 border-t border-slate-300 text-center">
-                                <span id="outTokPrintTime" class="text-[12px] font-mono font-bold text-slate-800 block uppercase">Waktu Cetak: -</span>
+                            <div class="mt-3 pt-2 border-t-2 border-black text-center">
+                                <span id="outTokPrintTime" class="text-[12px] font-mono font-bold text-black block uppercase">Waktu Cetak: -</span>
                             </div>
                         </div>
                     </div>
@@ -233,8 +259,8 @@
                             <span class="bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center mr-2">1</span>
                             Tempelkan Bukti Transaksi
                         </h2>
-                        <textarea id="rawTrfText" rows="3" placeholder="Tempel teks laporan transaksi di sini..." class="w-full p-2.5 border border-blue-300 rounded-lg text-xs font-mono bg-white outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-                        <p class="text-[11px] text-blue-700 font-medium">*Kode Agen, Bank, No. Rekening, & Nama otomatis terisi.</p>
+                        <textarea id="rawTrfText" rows="3" placeholder="Tempel teks di sini... (Contoh: CKBCA... SN: JUNIARNI-EKA-PROMAJA/REKENING*4780209009/BANK*BCA)" class="w-full p-2.5 border border-blue-300 rounded-lg text-xs font-mono bg-white outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                        <p class="text-[11px] text-blue-700 font-medium">*Data Bank, Rekening, & Nama otomatis terisi.</p>
                     </div>
 
                     <h2 class="text-base font-bold text-slate-900 uppercase border-b pb-2 pt-2 flex items-center">
@@ -243,42 +269,36 @@
                     </h2>
 
                     <div>
-                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Kode Agen</label>
-                        <input type="text" id="inTrfAgen" placeholder="-" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Bank / E-Wallet Tujuan</label>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Bank Tujuan</label>
                         <div class="space-y-1">
-                            <input type="text" id="searchBank" placeholder="🔍 Cari bank / e-wallet..." class="w-full p-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="text" id="searchBank" placeholder="🔍 Cari bank..." class="w-full p-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500">
                             <select id="inTrfBank" size="4" class="w-full p-2 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500 bg-white">
                                 <option value="BCA">BANK BCA</option>
-                                <option value="MANDIRI">BANK MANDIRI (MDR)</option>
+                                <option value="MANDIRI">BANK MANDIRI</option>
                                 <option value="BRI">BANK BRI</option>
                                 <option value="BNI">BANK BNI</option>
                                 <option value="BSI">BANK BSI (BANK SYARIAH INDONESIA)</option>
-                                <option value="CIMB">BANK CIMB NIAGA</option>
+                                <option value="CIMB NIAGA">BANK CIMB NIAGA</option>
                                 <option value="PERMATA">BANK PERMATA</option>
                                 <option value="DANAMON">BANK DANAMON</option>
                                 <option value="PANIN">BANK PANIN</option>
-                                <option value="OCBC">BANK OCBC NISP</option>
-                                <option value="BTPN">BANK BTPN / JENIUS</option>
-                                <option value="SEABANK">SEABANK INDONESIA</option>
-                                <option value="JAGO">BANK JAGO</option>
-                                <option value="NEO">BANK NEO COMMERCE</option>
-                                <option value="ALLO">ALLO BANK</option>
-                                <option value="BLU">BLU BY BCA DIGITAL</option>
+                                <option value="OCBC NISP">BANK OCBC NISP</option>
+                                <option value="BTPN / JENIUS">BANK BTPN / JENIUS</option>
+                                <option value="SEA BANK">SEABANK INDONESIA</option>
+                                <option value="BANK JAGO">BANK JAGO</option>
+                                <option value="BANK NEO COMMERCE">BANK NEO COMMERCE</option>
+                                <option value="ALLO BANK">ALLO BANK</option>
+                                <option value="BLU BY BCA">BLU BY BCA DIGITAL</option>
                                 <option value="DANA">E-WALLET DANA</option>
-                                <option value="OVO">E-WALLET OVO</option>
+                                <option value="OPO">E-WALLET OVO</option>
                                 <option value="GOPAY">E-WALLET GOPAY</option>
                                 <option value="SHOPEEPAY">E-WALLET SHOPEEPAY</option>
-                                <option value="LINKAJA">E-WALLET LINKAJA</option>
                             </select>
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nomor Rekening / HP</label>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nomor Rekening</label>
                         <input type="text" id="inTrfRek" placeholder="-" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
@@ -286,32 +306,39 @@
                         <input type="text" id="inTrfNama" placeholder="-" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nominal Pembelian (Rp)</label>
-                        <input type="text" id="inTrfNominal" placeholder="Masukkan nominal..." class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Biaya Admin (Rp)</label>
-                        <input type="text" id="inTrfAdmin" placeholder="Masukkan biaya admin..." class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Total Bayar (Rp)</label>
-                        <input type="text" id="inTrfTotal" readonly placeholder="Otomatis terhitung..." class="w-full p-2.5 border border-slate-200 bg-slate-100 rounded-lg text-sm font-bold text-emerald-700 outline-none">
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nominal Transfer (Rp)</label>
+                        <input type="text" id="inTrfNominal" placeholder="Isi nominal manual..." class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
 
-                    <button onclick="window.print()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg shadow-md transition-all text-sm uppercase tracking-wider flex items-center justify-center space-x-2">
-                        <span>🖨️</span>
-                        <span>Cetak Bukti Transfer</span>
-                    </button>
+                    <!-- FITUR ADD FOOTER SPECIAL OFFER TRANSFER -->
+                    <div class="pt-2 border-t border-slate-200 space-y-2">
+                        <label class="block text-xs font-bold text-slate-700 uppercase">📢 Add Footer / Penawaran Spesial</label>
+                        <textarea id="inTrfFooter" rows="2" placeholder="Tulis promo/info toko Anda di sini..." class="w-full p-2.5 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                        <button onclick="saveFooter('transfer')" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-1.5 rounded-lg text-xs uppercase tracking-wider transition">
+                            💾 SAVE Promo Transfer
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+                        <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg shadow-md transition-all text-xs uppercase tracking-wider flex items-center justify-center space-x-1">
+                            <span>🖨️</span>
+                            <span>Print Browser</span>
+                        </button>
+                        <button onclick="printDirectBT('transfer')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow-md transition-all text-xs uppercase tracking-wider flex items-center justify-center space-x-1">
+                            <span>📲</span>
+                            <span>Print Bluetooth</span>
+                        </button>
+                    </div>
                 </section>
 
                 <section class="md:col-span-7 space-y-6">
                     <div class="bg-white p-6 rounded-xl border border-slate-900 shadow-sm print-area">
                         <h3 class="text-sm font-bold text-slate-700 uppercase mb-4 no-print">Preview Bukti Transfer</h3>
-                        <div class="rounded-xl p-4 bg-gradient-to-br from-white to-slate-50 font-bold max-w-[80mm] mx-auto border border-dashed border-slate-300 md:border-none">
+                        <div class="rounded-xl p-4 bg-gradient-to-br from-white to-slate-50 thermal-font font-bold max-w-[80mm] mx-auto border border-dashed border-slate-300 md:border-none text-black">
                             
                             <!-- HEADER LOGO POINN PULSA -->
-                            <div class="flex flex-col items-center justify-center border-b pb-2 mb-3 text-center">
-                                <div class="w-16 h-16 rounded-full bg-black border-2 border-lime-400 flex items-center justify-center p-1 mb-1">
+                            <div class="flex flex-col items-center justify-center border-b-2 border-black pb-2 mb-3 text-center">
+                                <div class="w-16 h-16 rounded-full bg-black border-2 border-lime-400 flex items-center justify-center p-1 mb-1 no-print">
                                     <div class="flex items-center text-left leading-none font-black font-sans tracking-tight">
                                         <span class="text-white text-2xl font-black leading-none">P</span>
                                         <div class="flex flex-col -ml-0.5">
@@ -320,29 +347,30 @@
                                         </div>
                                     </div>
                                 </div>
-                                <span class="text-black font-black text-base block">BUKTI TRANSFER BANK</span>
-                                <span class="text-xs text-emerald-600 block font-black">TRANSAKSI BERHASIL</span>
+                                <span class="text-black font-black text-base block uppercase">BUKTI TRANSFER BANK</span>
+                                <span class="text-xs text-black block font-black">TRANSAKSI BERHASIL</span>
                             </div>
 
-                            <div class="space-y-1.5 text-xs text-slate-800">
-                                <div class="flex justify-between"><span>KODE AGEN:</span><span id="outTrfAgen">-</span></div>
+                            <div class="space-y-1.5 text-xs text-black">
                                 <div class="flex justify-between"><span>BANK TUJUAN:</span><span id="outTrfBank">-</span></div>
                                 <div class="flex justify-between"><span>NO. REKENING:</span><span id="outTrfRek">-</span></div>
                                 <div class="flex justify-between"><span>PENERIMA:</span><span id="outTrfNama">-</span></div>
-                                <div class="flex justify-between"><span>NOMINAL:</span><span id="outTrfNominal">Rp -</span></div>
-                                <div class="flex justify-between"><span>BIAYA ADMIN:</span><span id="outTrfAdmin">Rp -</span></div>
                             </div>
-                            <div class="py-3 my-2 border-y border-slate-300 flex justify-between items-center">
-                                <span class="text-xs uppercase">TOTAL BAYAR</span>
-                                <span id="outTrfTotal" class="font-mono text-base font-black text-emerald-700">Rp -</span>
+                            <div class="py-3 my-2 border-y-2 border-black flex justify-between items-center">
+                                <span class="text-xs uppercase">TOTAL TRANSFER</span>
+                                <span id="outTrfNominal" class="font-mono text-base font-black text-black">Rp -</span>
                             </div>
-                            <div class="text-center text-[10px] text-slate-600 mt-2">
+                            <div class="text-center text-[10px] text-black mt-2">
                                 Struk ini valid sebagai bukti pengiriman dana.
                             </div>
 
+                            <!-- FOOTER PROMO TERKUNCI -->
+                            <div id="outTrfFooter" class="mt-2 pt-2 border-t-2 border-black text-center text-xs font-bold text-black whitespace-pre-line hidden">
+                            </div>
+
                             <!-- FOOTER WAKTU CETAK INDONESIA LENGKAP -->
-                            <div class="mt-3 pt-2 border-t border-slate-300 text-center">
-                                <span id="outTrfPrintTime" class="text-[12px] font-mono font-bold text-slate-800 block uppercase">Waktu Cetak: -</span>
+                            <div class="mt-3 pt-2 border-t-2 border-black text-center">
+                                <span id="outTrfPrintTime" class="text-[12px] font-mono font-bold text-black block uppercase">Waktu Cetak: -</span>
                             </div>
                         </div>
                     </div>
@@ -387,20 +415,36 @@
                             <span class="bg-slate-100 text-slate-500 font-mono font-bold text-sm px-2.5 py-2.5 border-l border-slate-200 flex items-center select-none">#</span>
                         </div>
                     </div>
-                    <button onclick="window.print()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg shadow-md transition-all text-sm uppercase tracking-wider flex items-center justify-center space-x-2">
-                        <span>🖨️</span>
-                        <span>Cetak Voucher Thermal</span>
-                    </button>
+
+                    <!-- FITUR ADD FOOTER SPECIAL OFFER VOUCHER -->
+                    <div class="pt-2 border-t border-slate-200 space-y-2">
+                        <label class="block text-xs font-bold text-slate-700 uppercase">📢 Add Footer / Penawaran Spesial</label>
+                        <textarea id="inVouFooter" rows="2" placeholder="Tulis promo/info toko Anda di sini..." class="w-full p-2.5 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                        <button onclick="saveFooter('voucher')" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-1.5 rounded-lg text-xs uppercase tracking-wider transition">
+                            💾 SAVE Promo Voucher
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+                        <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg shadow-md transition-all text-xs uppercase tracking-wider flex items-center justify-center space-x-1">
+                            <span>🖨️</span>
+                            <span>Print Browser</span>
+                        </button>
+                        <button onclick="printDirectBT('voucher')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow-md transition-all text-xs uppercase tracking-wider flex items-center justify-center space-x-1">
+                            <span>📲</span>
+                            <span>Print Bluetooth</span>
+                        </button>
+                    </div>
                 </section>
 
                 <section class="md:col-span-7 space-y-6">
                     <div class="bg-white p-6 rounded-xl border border-slate-900 shadow-sm print-area">
                         <h3 class="text-sm font-bold text-slate-700 uppercase mb-4 no-print">Hasil Preview Tampilan Voucher (80mm)</h3>
-                        <div class="rounded-xl p-4 bg-gradient-to-br from-white to-slate-50 font-bold max-w-[80mm] mx-auto border border-dashed border-slate-300 md:border-none">
+                        <div class="rounded-xl p-4 bg-gradient-to-br from-white to-slate-50 thermal-font font-bold max-w-[80mm] mx-auto border border-dashed border-slate-300 md:border-none text-black">
                             
                             <!-- HEADER LOGO POINN PULSA -->
-                            <div class="flex flex-col items-center justify-center border-b pb-2 mb-3 text-center">
-                                <div class="w-16 h-16 rounded-full bg-black border-2 border-lime-400 flex items-center justify-center p-1 mb-1">
+                            <div class="flex flex-col items-center justify-center border-b-2 border-black pb-2 mb-3 text-center">
+                                <div class="w-16 h-16 rounded-full bg-black border-2 border-lime-400 flex items-center justify-center p-1 mb-1 no-print">
                                     <div class="flex items-center text-left leading-none font-black font-sans tracking-tight">
                                         <span class="text-white text-2xl font-black leading-none">P</span>
                                         <div class="flex flex-col -ml-0.5">
@@ -411,34 +455,38 @@
                                 </div>
                                 <div class="flex justify-between items-center w-full mt-1">
                                     <span id="outProvider" class="text-black font-black text-sm uppercase">TELKOMSEL</span>
-                                    <span class="text-xs font-bold text-slate-700 uppercase">Voucher Fisik</span>
+                                    <span class="text-xs font-bold text-black uppercase">Voucher Fisik</span>
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-3 gap-1 mb-4 items-center">
+                            <div class="grid grid-cols-3 gap-1 mb-4 items-center border-b-2 border-black pb-2">
                                 <div>
-                                    <span class="block text-[14px] text-slate-700 uppercase">Kuota</span>
-                                    <span id="outKuota" class="text-[16px] font-black text-slate-900 block">10 GB</span>
+                                    <span class="block text-[12px] text-black uppercase">Kuota</span>
+                                    <span id="outKuota" class="text-[14px] font-black text-black block">10 GB</span>
                                 </div>
                                 <div>
-                                    <span class="block text-[14px] text-slate-700 uppercase">Masa Aktif</span>
-                                    <span id="outMasaAktif" class="text-[16px] font-black text-slate-900 block">30 Hari</span>
+                                    <span class="block text-[12px] text-black uppercase">Masa Aktif</span>
+                                    <span id="outMasaAktif" class="text-[14px] font-black text-black block">30 Hari</span>
                                 </div>
                                 <div class="text-right">
-                                    <span class="block text-[14px] text-slate-700 uppercase">Harga</span>
-                                    <span id="outHarga" class="text-[16px] font-black text-emerald-700 block">Rp 60.000</span>
+                                    <span class="block text-[12px] text-black uppercase">Harga</span>
+                                    <span id="outHarga" class="text-[14px] font-black text-black block">Rp 60.000</span>
                                 </div>
                             </div>
-                            <div class="py-2 text-center">
-                                <span class="block text-[14px] font-bold text-slate-700 uppercase tracking-widest mb-1">Kode Voucher / Dial</span>
-                                <span id="outPrefix" class="font-mono text-[20px] font-black text-slate-900 block">*133*</span>
-                                <span id="outSisaKode" class="font-mono text-[20px] font-black text-slate-900 block break-all">30421005451161822#</span>
+                            <div class="py-2 text-center border-b-2 border-black">
+                                <span class="block text-[12px] font-bold text-black uppercase tracking-widest mb-1">Kode Voucher / Dial</span>
+                                <span id="outPrefix" class="font-mono text-[18px] font-black text-black block">*133*</span>
+                                <span id="outSisaKode" class="font-mono text-[18px] font-black text-black block break-all">30421005451161822#</span>
                             </div>
-                            <p class="text-[16px] text-slate-800 font-bold text-center italic mt-2">Tekan panggil/YES/CALL untuk pengisian.</p>
+                            <p class="text-[14px] text-black font-bold text-center italic mt-2">Tekan panggil/YES/CALL untuk pengisian.</p>
                             
+                            <!-- FOOTER PROMO TERKUNCI -->
+                            <div id="outVouFooter" class="mt-2 pt-2 border-t-2 border-black text-center text-xs font-bold text-black whitespace-pre-line hidden">
+                            </div>
+
                             <!-- FOOTER WAKTU CETAK INDONESIA LENGKAP -->
-                            <div class="mt-3 pt-2 border-t border-slate-300 text-center">
-                                <span id="outPrintTime" class="text-[12px] font-mono font-bold text-slate-800 block uppercase">Waktu Cetak: -</span>
+                            <div class="mt-3 pt-2 border-t-2 border-black text-center">
+                                <span id="outPrintTime" class="text-[12px] font-mono font-bold text-black block uppercase">Waktu Cetak: -</span>
                             </div>
                         </div>
                     </div>
@@ -448,21 +496,20 @@
         </main>
     </div>
 
-    <!-- Script Application Logic -->
+    <!-- Script Application Logic & Bluetooth Integration -->
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        // Variabel Akses Bluetooth Printer Global
+        let bluetoothDevice = null;
+        let printCharacteristic = null;
 
-            function parseCurrency(str) {
-                if (!str) return 0;
-                return parseInt(str.toString().replace(/[^0-9]/g, ''), 10) || 0;
-            }
+        document.addEventListener('DOMContentLoaded', () => {
 
             function formatRupiah(value) {
                 let numberString = value.toString().replace(/[^,\d]/g, '');
                 return numberString.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
             }
 
-            // MENGAMBIL WAKTU SEKARANG VERSI INDONESIA
+            // WAKTU SEKARANG REALTIME INDONESIA
             function getFormattedNow() {
                 const now = new Date();
                 const pad = (n) => n.toString().padStart(2, '0');
@@ -498,7 +545,7 @@
                 });
             }
 
-            // ================= PARSER OTOMATIS BUKTI TRANSAKSI PLN =================
+            // ================= PARSER TOKEN PLN =================
             const rawTokenText = document.getElementById('rawTokenText');
             if (rawTokenText) {
                 rawTokenText.addEventListener('input', parseTokenReport);
@@ -506,103 +553,51 @@
 
             function parseTokenReport() {
                 if (!rawTokenText) return;
-                const text = rawTokenText.value.trim();
+                const text = rawTokenText.value.trim().toUpperCase();
                 if (!text) return;
-
-                const elAgen = document.getElementById('inTokAgen');
-                const elIdPel = document.getElementById('inTokIdPel');
-                const elNama = document.getElementById('inTokNama');
-                const elDaya = document.getElementById('inTokDaya');
-                const elKwh = document.getElementById('inTokKwh');
-                const elNominal = document.getElementById('inTokNominal');
-                const elKode = document.getElementById('inTokKode');
-
-                const agenMatch = text.match(/Agen\s+([^,]+)/i);
-                if (agenMatch && elAgen) {
-                    elAgen.value = agenMatch[1].trim();
-                }
-
-                const idMatch = text.match(/(?:PLN\d*|IDPEL)?[\.\s]*(\d{11,12})/i);
-                if (idMatch && elIdPel) {
-                    elIdPel.value = idMatch[1].trim();
-                }
-
-                const hrgMatch = text.match(/Hrg\s*=\s*(\d+)/i) || text.match(/Hrg\s*(\d+)/i);
-                if (hrgMatch && elNominal) {
-                    elNominal.value = formatRupiah(hrgMatch[1].trim());
-                }
 
                 const snIndex = text.indexOf("SN:");
                 if (snIndex !== -1) {
                     const snContent = text.substring(snIndex + 3).trim();
                     const parts = snContent.split('/');
 
-                    if (parts.length >= 1 && elKode) {
-                        elKode.value = parts[0].trim();
-                    }
+                    if (parts.length >= 7) {
+                        const kodeToken = parts[0].trim();
+                        const nama = parts[1].trim();
+                        const idPel = parts[2].trim();
+                        const tarif = parts[5].trim();
+                        const daya = parts[6].trim();
 
-                    if (parts.length >= 2 && elNama) {
-                        elNama.value = parts[1].trim().replace(/-/g, ' ');
-                    }
+                        const elIdPel = document.getElementById('inTokIdPel');
+                        const elNama = document.getElementById('inTokNama');
+                        const elDaya = document.getElementById('inTokDaya');
+                        const elKode = document.getElementById('inTokKode');
 
-                    if (parts.length >= 4) {
-                        const lastPart = parts[parts.length - 1].trim();
-                        const kwhMatch = lastPart.match(/^([\d\.\,]+)/);
-                        if (kwhMatch && elKwh) {
-                            elKwh.value = kwhMatch[1] + " kWh";
-                        }
-                    }
+                        if (elIdPel) elIdPel.value = idPel;
+                        if (elNama) elNama.value = nama;
+                        if (elDaya) elDaya.value = `${tarif} / ${daya} VA`;
+                        if (elKode) elKode.value = kodeToken;
 
-                    let tarifStr = "", dayaStr = "";
-                    for (let i = 2; i < parts.length - 1; i++) {
-                        const item = parts[i].trim();
-                        if (item.match(/^(R\d*|B\d*|I\d*|P\d*|S\d*|T\d*)/i)) {
-                            tarifStr = item;
-                        } else if (item.match(/^\d+$/) && item.length <= 6) {
-                            dayaStr = item;
-                        }
-                    }
-
-                    if (elDaya) {
-                        if (tarifStr && dayaStr) {
-                            elDaya.value = `${tarifStr} / ${dayaStr} VA`;
-                        } else if (dayaStr) {
-                            elDaya.value = `${dayaStr} VA`;
-                        } else if (tarifStr) {
-                            elDaya.value = tarifStr;
-                        }
+                        updateTokenStruk();
                     }
                 }
-
-                updateTokenStruk();
             }
 
             function updateTokenStruk() {
-                const outAgen = document.getElementById('outTokAgen');
                 const outIdPel = document.getElementById('outTokIdPel');
                 const outNama = document.getElementById('outTokNama');
                 const outDaya = document.getElementById('outTokDaya');
-                const outKwh = document.getElementById('outTokKwh');
-                const outNominal = document.getElementById('outTokNominal');
                 const outKode = document.getElementById('outTokKode');
 
-                if (outAgen) outAgen.textContent = document.getElementById('inTokAgen')?.value || '-';
                 if (outIdPel) outIdPel.textContent = document.getElementById('inTokIdPel')?.value || '-';
                 if (outNama) outNama.textContent = document.getElementById('inTokNama')?.value || '-';
                 if (outDaya) outDaya.textContent = document.getElementById('inTokDaya')?.value || '-';
-                if (outKwh) outKwh.textContent = document.getElementById('inTokKwh')?.value || '-';
-                if (outNominal) {
-                    const valNom = document.getElementById('inTokNominal')?.value;
-                    outNominal.textContent = valNom ? 'Rp ' + valNom : 'Rp -';
-                }
                 if (outKode) outKode.textContent = document.getElementById('inTokKode')?.value || '-';
             }
 
-            bindInput('inTokAgen', 'outTokAgen');
             bindInput('inTokIdPel', 'outTokIdPel');
             bindInput('inTokNama', 'outTokNama');
             bindInput('inTokDaya', 'outTokDaya');
-            bindInput('inTokKwh', 'outTokKwh');
             bindInput('inTokKode', 'outTokKode');
 
             const inTokNominal = document.getElementById('inTokNominal');
@@ -615,7 +610,7 @@
                 });
             }
 
-            // ================= PARSER OTOMATIS BUKTI TRANSFER =================
+            // ================= PARSER BUKTI TRANSFER =================
             const rawTrfText = document.getElementById('rawTrfText');
             if (rawTrfText) {
                 rawTrfText.addEventListener('input', parseTransferReport);
@@ -623,106 +618,63 @@
 
             function parseTransferReport() {
                 if (!rawTrfText) return;
-                const text = rawTrfText.value.trim();
+                const text = rawTrfText.value.trim().toUpperCase();
                 if (!text) return;
 
-                const elAgen = document.getElementById('inTrfAgen');
-                const elBankSelect = document.getElementById('inTrfBank');
-                const elRek = document.getElementById('inTrfRek');
-                const elNama = document.getElementById('inTrfNama');
+                const snIndex = text.indexOf("SN:");
+                if (snIndex !== -1) {
+                    const snContent = text.substring(snIndex + 3).trim();
+                    const parts = snContent.split('/');
 
-                // 1. KODE AGEN: Ambil setelah "Agen " hingga tanda koma ","
-                const agenMatch = text.match(/Agen\s+([^,]+)/i);
-                if (agenMatch && elAgen) {
-                    elAgen.value = agenMatch[1].trim();
-                }
+                    let rawNama = "", rawRek = "", rawBank = "";
 
-                // 2. BANK TUJUAN & NO REKENING
-                const pblMatch = text.match(/Pembelian\s+([A-Za-z0-9]+)\.(\d+)\s+Hrg=/i);
-                if (pblMatch) {
-                    let rawBankCode = pblMatch[1].trim(); // Misal: CKDANA, CKMDR, CKBNI
-                    
-                    // Hilangkan prefiks 'CK' di awal kode jika ada
-                    let cleanBankCode = rawBankCode.replace(/^CK/i, '').trim();
+                    parts.forEach(part => {
+                        const item = part.trim();
+                        if (item.startsWith("REKENING*")) {
+                            rawRek = item.replace("REKENING*", "").trim();
+                        } else if (item.startsWith("BANK*")) {
+                            rawBank = item.replace("BANK*", "").trim();
+                        } else if (!rawNama) {
+                            rawNama = item.replace(/-/g, " ").trim();
+                        }
+                    });
 
-                    if (elRek) elRek.value = pblMatch[2].trim();
+                    const elNama = document.getElementById('inTrfNama');
+                    const elRek = document.getElementById('inTrfRek');
+                    const elBankSelect = document.getElementById('inTrfBank');
 
-                    if (elBankSelect) {
+                    if (elNama) elNama.value = rawNama;
+                    if (elRek) elRek.value = rawRek;
+
+                    if (elBankSelect && rawBank) {
                         let matched = false;
                         for (let option of elBankSelect.options) {
-                            const optVal = option.value.toUpperCase();
-                            const optText = option.text.toUpperCase();
-                            
-                            // Cocokkan dengan value, teks option, atau mapping khusus
-                            if (optVal === cleanBankCode.toUpperCase() || 
-                                optText.includes(cleanBankCode.toUpperCase()) ||
-                                (cleanBankCode.toUpperCase() === 'MDR' && optVal === 'MANDIRI')) {
+                            if (option.value === rawBank || option.text.includes(rawBank)) {
                                 option.selected = true;
                                 matched = true;
                                 break;
                             }
                         }
-                        // Jika tidak ada di list drop-down, tambahkan secara otomatis
                         if (!matched) {
-                            const newOpt = new Option(`BANK ${cleanBankCode.toUpperCase()}`, cleanBankCode.toUpperCase(), true, true);
+                            const newOpt = new Option(`BANK ${rawBank}`, rawBank, true, true);
                             elBankSelect.add(newOpt);
                         }
                     }
+
+                    updateTransferStruk();
                 }
-
-                // 3. NAMA PENERIMA
-                const snIndex = text.indexOf("SN:");
-                if (snIndex !== -1 && elNama) {
-                    let snText = text.substring(snIndex + 3).trim();
-                    snText = snText.replace(/^SN:\s*/i, '');
-                    let rawNama = snText.split('/')[0].split('-tgl-')[0].trim();
-                    rawNama = rawNama.replace(/-/g, ' ').trim();
-                    elNama.value = rawNama;
-                }
-
-                updateTransferStruk();
-            }
-
-            function calculateTransferTotal() {
-                const elNominal = document.getElementById('inTrfNominal');
-                const elAdmin = document.getElementById('inTrfAdmin');
-                const elTotal = document.getElementById('inTrfTotal');
-                const outTotal = document.getElementById('outTrfTotal');
-
-                const valNominal = parseCurrency(elNominal?.value);
-                const valAdmin = parseCurrency(elAdmin?.value);
-                const sum = valNominal + valAdmin;
-
-                const formattedSum = sum > 0 ? formatRupiah(sum) : '0';
-                if (elTotal) elTotal.value = formattedSum;
-                if (outTotal) outTotal.textContent = 'Rp ' + formattedSum;
             }
 
             function updateTransferStruk() {
-                const outAgen = document.getElementById('outTrfAgen');
                 const outBank = document.getElementById('outTrfBank');
                 const outRek = document.getElementById('outTrfRek');
                 const outNama = document.getElementById('outTrfNama');
 
-                const elBankSelect = document.getElementById('inTrfBank');
-                let selectedBankText = '-';
-                if (elBankSelect && elBankSelect.selectedIndex !== -1) {
-                    selectedBankText = elBankSelect.options[elBankSelect.selectedIndex].text;
-                }
-
-                if (outAgen) outAgen.textContent = document.getElementById('inTrfAgen')?.value || '-';
-                if (outBank) outBank.textContent = selectedBankText;
+                if (outBank) outBank.textContent = document.getElementById('inTrfBank')?.value || '-';
                 if (outRek) outRek.textContent = document.getElementById('inTrfRek')?.value || '-';
                 if (outNama) outNama.textContent = document.getElementById('inTrfNama')?.value || '-';
-
-                calculateTransferTotal();
             }
 
-            bindInput('inTrfAgen', 'outTrfAgen');
-            bindInput('inTrfRek', 'outTrfRek');
-            bindInput('inTrfNama', 'outTrfNama');
-
-            // Fitur Pencarian pada Drop-Down Bank
             const searchBankInput = document.getElementById('searchBank');
             const bankSelect = document.getElementById('inTrfBank');
 
@@ -740,23 +692,16 @@
                 bankSelect.addEventListener('change', updateTransferStruk);
             }
 
+            bindInput('inTrfRek', 'outTrfRek');
+            bindInput('inTrfNama', 'outTrfNama');
+
             const inTrfNominal = document.getElementById('inTrfNominal');
             if (inTrfNominal) {
                 inTrfNominal.addEventListener('input', (e) => {
                     e.target.value = formatRupiah(e.target.value);
                     const outTrfNominal = document.getElementById('outTrfNominal');
                     if (outTrfNominal) outTrfNominal.textContent = 'Rp ' + (e.target.value || '0');
-                    calculateTransferTotal();
-                });
-            }
-
-            const inTrfAdmin = document.getElementById('inTrfAdmin');
-            if (inTrfAdmin) {
-                inTrfAdmin.addEventListener('input', (e) => {
-                    e.target.value = formatRupiah(e.target.value);
-                    const outTrfAdmin = document.getElementById('outTrfAdmin');
-                    if (outTrfAdmin) outTrfAdmin.textContent = 'Rp ' + (e.target.value || '0');
-                    calculateTransferTotal();
+                    updateTransferStruk();
                 });
             }
 
@@ -800,12 +745,176 @@
                 if (el) el.addEventListener('input', updateVoucher);
             });
 
+            // Initial Load Footer dari Storage
+            loadSavedFooters();
+
             // Initial Update
             updateTokenStruk();
             updateTransferStruk();
             updateVoucher();
         });
 
+        // ================= FITUR SAVE FOOTER (PROMO SPESIAL) =================
+        function saveFooter(type) {
+            let inputId, outputId, storageKey;
+            if (type === 'token') {
+                inputId = 'inTokFooter'; outputId = 'outTokFooter'; storageKey = 'saved_footer_token';
+            } else if (type === 'transfer') {
+                inputId = 'inTrfFooter'; outputId = 'outTrfFooter'; storageKey = 'saved_footer_transfer';
+            } else {
+                inputId = 'inVouFooter'; outputId = 'outVouFooter'; storageKey = 'saved_footer_voucher';
+            }
+
+            const val = document.getElementById(inputId)?.value.trim() || '';
+            localStorage.setItem(storageKey, val);
+
+            const outEl = document.getElementById(outputId);
+            if (outEl) {
+                if (val) {
+                    outEl.textContent = val;
+                    outEl.classList.remove('hidden');
+                } else {
+                    outEl.classList.add('hidden');
+                }
+            }
+            alert('Promo footer berhasil dikunci (terseimpan)!');
+        }
+
+        function loadSavedFooters() {
+            const types = [
+                { idIn: 'inTokFooter', idOut: 'outTokFooter', key: 'saved_footer_token' },
+                { idIn: 'inTrfFooter', idOut: 'outTrfFooter', key: 'saved_footer_transfer' },
+                { idIn: 'inVouFooter', idOut: 'outVouFooter', key: 'saved_footer_voucher' }
+            ];
+
+            types.forEach(t => {
+                const val = localStorage.getItem(t.key);
+                if (val) {
+                    const inEl = document.getElementById(t.idIn);
+                    const outEl = document.getElementById(t.idOut);
+                    if (inEl) inEl.value = val;
+                    if (outEl) {
+                        outEl.textContent = val;
+                        outEl.classList.remove('hidden');
+                    }
+                }
+            });
+        }
+
+        // ================= FITUR DIRECT BLUETOOTH PRINT (80MM) =================
+        async function connectBluetoothPrinter() {
+            if (!navigator.bluetooth) {
+                alert('Browser Anda belum mendukung Web Bluetooth. Gunakan Chrome di Android / Desktop, atau aplikasi browser dengan Web Bluetooth (seperti Blueify/WebBLE) di iOS.');
+                return;
+            }
+
+            try {
+                bluetoothDevice = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true,
+                    optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', 'e7810a71-73ae-499d-8c15-faa9aef0c3f2']
+                });
+
+                const server = await bluetoothDevice.gatt.connect();
+                const services = await server.getPrimaryServices();
+
+                for (const service of services) {
+                    const characteristics = await service.getCharacteristics();
+                    for (const char of characteristics) {
+                        if (char.properties.write || char.properties.writeWithoutResponse) {
+                            printCharacteristic = char;
+                            break;
+                        }
+                    }
+                    if (printCharacteristic) break;
+                }
+
+                if (printCharacteristic) {
+                    document.getElementById('btStatusText').textContent = 'BT Connected: ' + bluetoothDevice.name;
+                    alert('Printer Bluetooth berhasil terhubung!');
+                } else {
+                    alert('Layanan pencetakan tidak ditemukan pada perangkat Bluetooth ini.');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Gagal menghubungkan Bluetooth Printer: ' + error.message);
+            }
+        }
+
+        async function printDirectBT(type) {
+            if (!printCharacteristic) {
+                alert('Printer Bluetooth belum terhubung! Silakan klik tombol "Connect BT Printer" di bagian atas terlebih dahulu.');
+                return;
+            }
+
+            let printText = "";
+            const line = "------------------------------------------------\n"; // 48 karakter untuk 80mm
+
+            if (type === 'token') {
+                printText += "             POINN PULSA             \n";
+                printText += "     STRUK PEMBELIAN TOKEN PLN       \n";
+                printText += "          PT. PLN (PERSERO)          \n";
+                printText += line;
+                printText += `IDPEL/METER : ${document.getElementById('outTokIdPel').textContent}\n`;
+                printText += `NAMA        : ${document.getElementById('outTokNama').textContent}\n`;
+                printText += `TARIF/DAYA  : ${document.getElementById('outTokDaya').textContent}\n`;
+                printText += `NOMINAL     : ${document.getElementById('outTokNominal').textContent}\n`;
+                printText += line;
+                printText += "KODE TOKEN STROOM:\n";
+                printText += `${document.getElementById('outTokKode').textContent}\n`;
+                printText += line;
+                printText += "Simpan struk ini sebagai bukti pembayaran yang sah.\n";
+                const ft = localStorage.getItem('saved_footer_token');
+                if (ft) printText += line + ft + "\n";
+                printText += line;
+                printText += `${document.getElementById('outTokPrintTime').textContent}\n\n\n`;
+            } else if (type === 'transfer') {
+                printText += "             POINN PULSA             \n";
+                printText += "         BUKTI TRANSFER BANK         \n";
+                printText += "         TRANSAKSI BERHASIL          \n";
+                printText += line;
+                printText += `BANK TUJUAN : ${document.getElementById('outTrfBank').textContent}\n`;
+                printText += `NO. REKENING: ${document.getElementById('outTrfRek').textContent}\n`;
+                printText += `PENERIMA    : ${document.getElementById('outTrfNama').textContent}\n`;
+                printText += line;
+                printText += `TOTAL TRF   : ${document.getElementById('outTrfNominal').textContent}\n`;
+                printText += line;
+                printText += "Struk ini valid sebagai bukti pengiriman dana.\n";
+                const ft = localStorage.getItem('saved_footer_transfer');
+                if (ft) printText += line + ft + "\n";
+                printText += line;
+                printText += `${document.getElementById('outTrfPrintTime').textContent}\n\n\n`;
+            } else {
+                printText += "             POINN PULSA             \n";
+                printText += `PROVIDER    : ${document.getElementById('outProvider').textContent}\n`;
+                printText += line;
+                printText += `KUOTA       : ${document.getElementById('outKuota').textContent}\n`;
+                printText += `MASA AKTIF  : ${document.getElementById('outMasaAktif').textContent}\n`;
+                printText += `HARGA       : ${document.getElementById('outHarga').textContent}\n`;
+                printText += line;
+                printText += "KODE VOUCHER / DIAL:\n";
+                printText += `${document.getElementById('outPrefix').textContent}${document.getElementById('outSisaKode').textContent}\n`;
+                printText += line;
+                printText += "Tekan panggil/YES/CALL untuk pengisian.\n";
+                const ft = localStorage.getItem('saved_footer_voucher');
+                if (ft) printText += line + ft + "\n";
+                printText += line;
+                printText += `${document.getElementById('outPrintTime').textContent}\n\n\n`;
+            }
+
+            try {
+                const encoder = new TextEncoder();
+                // Inisialisasi Printer (ESC @)
+                await printCharacteristic.writeValue(new Uint8Array([0x1B, 0x40]));
+                // Kirim Teks
+                const data = encoder.encode(printText);
+                await printCharacteristic.writeValue(data);
+                alert('Perintah cetak terkirim ke printer!');
+            } catch (e) {
+                alert('Gagal mengirim data ke printer: ' + e.message);
+            }
+        }
+
+        // ================= SWITCH TAB & LOGIN/LOGOUT =================
         function switchTab(tabName) {
             document.querySelectorAll('.module-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(btn => {
