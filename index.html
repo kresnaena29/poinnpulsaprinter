@@ -6,6 +6,9 @@
     <title>Sistem Cetak Struk Online</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Cropper.js CSS & JS untuk Fitur Pangkas Gambar di Print Laporan -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <style>
         /* Font A Thermal Printer Standard (Monospace/Courier) */
         .thermal-font {
@@ -75,7 +78,7 @@
     <div id="loginSection" class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-200">
             <div class="text-center mb-6">
-                <!-- LOGO LINGKARAN POINNPULSA MONOKROM (DIPERBESAR) -->
+                <!-- LOGO LINGKARAN POINNPULSA MONOKROM -->
                 <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-black border-4 border-white p-1 shadow-md mb-2 logo-circle">
                     <div class="flex items-center text-left leading-none font-black font-sans tracking-tight">
                         <span class="text-white text-4xl font-black leading-none">P</span>
@@ -138,18 +141,29 @@
             </div>
         </header>
 
-        <nav class="max-w-6xl mx-auto mb-6 grid grid-cols-1 md:grid-cols-3 gap-4 no-print">
-            <button onclick="switchTab('token')" id="btnTabToken" class="tab-btn p-4 rounded-xl border-2 font-bold flex items-center justify-center space-x-3 transition-all duration-200 bg-blue-600 border-blue-600 text-white shadow-md">
-                <span class="text-2xl">⚡</span>
-                <span class="text-sm uppercase tracking-wide">Print Struk Token</span>
+        <!-- NAVIGASI TAB MENU (DITAMBAHKAN 2 MENU BARU) -->
+        <nav class="max-w-6xl mx-auto mb-6 grid grid-cols-2 md:grid-cols-5 gap-3 no-print">
+            <button onclick="switchTab('token')" id="btnTabToken" class="tab-btn p-3 rounded-xl border-2 font-bold flex items-center justify-center space-x-2 transition-all duration-200 bg-blue-600 border-blue-600 text-white shadow-md">
+                <span class="text-xl">⚡</span>
+                <span class="text-xs uppercase tracking-wide">Print Token</span>
             </button>
-            <button onclick="switchTab('transfer')" id="btnTabTransfer" class="tab-btn p-4 rounded-xl border-2 font-bold flex items-center justify-center space-x-3 transition-all duration-200 bg-white border-slate-200 text-slate-700 hover:border-blue-400">
-                <span class="text-2xl">💸</span>
-                <span class="text-sm uppercase tracking-wide">Print Bukti Transfer</span>
+            <button onclick="switchTab('transfer')" id="btnTabTransfer" class="tab-btn p-3 rounded-xl border-2 font-bold flex items-center justify-center space-x-2 transition-all duration-200 bg-white border-slate-200 text-slate-700 hover:border-blue-400">
+                <span class="text-xl">💸</span>
+                <span class="text-xs uppercase tracking-wide">Print Transfer</span>
             </button>
-            <button onclick="switchTab('voucher')" id="btnTabVoucher" class="tab-btn p-4 rounded-xl border-2 font-bold flex items-center justify-center space-x-3 transition-all duration-200 bg-white border-slate-200 text-slate-700 hover:border-blue-400">
-                <span class="text-2xl">📲</span>
-                <span class="text-sm uppercase tracking-wide">Print Voucher</span>
+            <button onclick="switchTab('voucher')" id="btnTabVoucher" class="tab-btn p-3 rounded-xl border-2 font-bold flex items-center justify-center space-x-2 transition-all duration-200 bg-white border-slate-200 text-slate-700 hover:border-blue-400">
+                <span class="text-xl">📲</span>
+                <span class="text-xs uppercase tracking-wide">Print Voucher</span>
+            </button>
+            <!-- FITUR BARU 1 -->
+            <button onclick="switchTab('universal')" id="btnTabUniversal" class="tab-btn p-3 rounded-xl border-2 font-bold flex items-center justify-center space-x-2 transition-all duration-200 bg-white border-slate-200 text-slate-700 hover:border-blue-400">
+                <span class="text-xl">🌐</span>
+                <span class="text-xs uppercase tracking-wide">Print Universal</span>
+            </button>
+            <!-- FITUR BARU 2 -->
+            <button onclick="switchTab('laporan')" id="btnTabLaporan" class="tab-btn p-3 rounded-xl border-2 font-bold flex items-center justify-center space-x-2 transition-all duration-200 bg-white border-slate-200 text-slate-700 hover:border-blue-400 col-span-2 md:col-span-1">
+                <span class="text-xl">🖼️</span>
+                <span class="text-xs uppercase tracking-wide">Print Laporan</span>
             </button>
         </nav>
 
@@ -201,7 +215,7 @@
                         <input type="text" id="inTokKode" placeholder="-" class="w-full p-2.5 border border-blue-400 bg-blue-50 rounded-lg text-sm font-mono font-bold text-blue-900 outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
 
-                    <!-- FITUR ADD FOOTER PROMO -->
+                    <!-- FOOTER PROMO -->
                     <div class="pt-2 border-t border-slate-200">
                         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Footer / Pesan Promo Spesial</label>
                         <textarea id="inTokFooter" rows="2" placeholder="Tulis penawaran spesial / promo..." class="w-full p-2.5 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500 mb-2"></textarea>
@@ -228,7 +242,7 @@
                         <h3 class="text-sm font-bold text-slate-700 uppercase mb-4 no-print">Preview Struk Token PLN</h3>
                         <div class="rounded-xl p-4 bg-gradient-to-br from-white to-slate-50 thermal-font font-bold max-w-[80mm] mx-auto border border-dashed border-black md:border-none">
                             
-                            <!-- HEADER LOGO POINN PULSA MONOKROM (DIPERBESAR w-24 h-24) -->
+                            <!-- HEADER LOGO POINN PULSA MONOKROM -->
                             <div class="flex flex-col items-center justify-center border-b border-black pb-2 mb-3 text-center">
                                 <div class="w-24 h-24 rounded-full bg-black border-2 border-white flex items-center justify-center p-1 mb-1 shadow-sm logo-circle">
                                     <div class="flex items-center text-left leading-none font-black font-sans tracking-tight">
@@ -347,7 +361,7 @@
                         <input type="text" id="inTrfTotal" readonly placeholder="Otomatis terhitung..." class="w-full p-2.5 border border-slate-200 bg-slate-100 rounded-lg text-sm font-bold text-emerald-700 outline-none">
                     </div>
 
-                    <!-- FITUR ADD FOOTER PROMO -->
+                    <!-- FOOTER PROMO -->
                     <div class="pt-2 border-t border-slate-200">
                         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Footer / Pesan Promo Spesial</label>
                         <textarea id="inTrfFooter" rows="2" placeholder="Tulis penawaran spesial / promo..." class="w-full p-2.5 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500 mb-2"></textarea>
@@ -374,7 +388,7 @@
                         <h3 class="text-sm font-bold text-slate-700 uppercase mb-4 no-print">Preview Bukti Transfer</h3>
                         <div class="rounded-xl p-4 bg-gradient-to-br from-white to-slate-50 thermal-font font-bold max-w-[80mm] mx-auto border border-dashed border-black md:border-none">
                             
-                            <!-- HEADER LOGO POINN PULSA MONOKROM (DIPERBESAR w-24 h-24) -->
+                            <!-- HEADER LOGO POINN PULSA MONOKROM -->
                             <div class="flex flex-col items-center justify-center border-b border-black pb-2 mb-3 text-center">
                                 <div class="w-24 h-24 rounded-full bg-black border-2 border-white flex items-center justify-center p-1 mb-1 shadow-sm logo-circle">
                                     <div class="flex items-center text-left leading-none font-black font-sans tracking-tight">
@@ -458,7 +472,7 @@
                         </div>
                     </div>
 
-                    <!-- FITUR ADD FOOTER PROMO -->
+                    <!-- FOOTER PROMO -->
                     <div class="pt-2 border-t border-slate-200">
                         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Footer / Pesan Promo Spesial</label>
                         <textarea id="inVouFooter" rows="2" placeholder="Tulis penawaran spesial / promo..." class="w-full p-2.5 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500 mb-2"></textarea>
@@ -485,7 +499,7 @@
                         <h3 class="text-sm font-bold text-slate-700 uppercase mb-4 no-print">Hasil Preview Tampilan Voucher (80mm)</h3>
                         <div class="rounded-xl p-4 bg-gradient-to-br from-white to-slate-50 thermal-font font-bold max-w-[80mm] mx-auto border border-dashed border-black md:border-none">
                             
-                            <!-- HEADER LOGO POINN PULSA MONOKROM (DIPERBESAR w-24 h-24) -->
+                            <!-- HEADER LOGO POINN PULSA MONOKROM -->
                             <div class="flex flex-col items-center justify-center border-b border-black pb-2 mb-3 text-center">
                                 <div class="w-24 h-24 rounded-full bg-black border-2 border-white flex items-center justify-center p-1 mb-1 shadow-sm logo-circle">
                                     <div class="flex items-center text-left leading-none font-black font-sans tracking-tight">
@@ -537,14 +551,183 @@
                 </section>
             </div>
 
+            <!-- ================= MODUL 4 (FITUR BARU 1): PRINT UNIVERSAL ================= -->
+            <div id="moduleUniversal" class="module-content hidden grid grid-cols-1 md:grid-cols-12 gap-6">
+                <section class="md:col-span-5 bg-white p-6 rounded-xl border border-slate-200 shadow-sm no-print space-y-4">
+                    <div class="bg-blue-50/70 p-4 rounded-xl border border-blue-200 space-y-2">
+                        <h2 class="text-sm font-bold text-blue-900 uppercase flex items-center">
+                            <span class="bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center mr-2">1</span>
+                            Tempelkan Report Transaksi
+                        </h2>
+                        <textarea id="rawUnivText" rows="3" placeholder="Contoh: >>ALL TRANSAKSI LANCARRR<< Agen POIN PULSA_1, Pembelian RE20E.089602035849 Hrg=23000 telah berhasil. Saldo Rp.(Awal 627253 Akhir 604253)" class="w-full p-2.5 border border-blue-300 rounded-lg text-xs font-mono bg-white outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                        <p class="text-[11px] text-blue-700 font-medium">*Kode Agen, Kode Pembelian, & Nominal terisi otomatis saat ditempel.</p>
+                    </div>
+
+                    <h2 class="text-base font-bold text-slate-900 uppercase border-b pb-2 pt-2 flex items-center">
+                        <span class="bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center mr-2">2</span>
+                        Edit Struk Universal
+                    </h2>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Kode Agen</label>
+                        <input type="text" id="inUnivAgen" placeholder="POIN PULSA_1" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Kode Pembelian</label>
+                        <input type="text" id="inUnivKodePbl" placeholder="RE20E" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Kategori Produk</label>
+                        <select id="inUnivKategori" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                            <option value="OPERATOR">OPERATOR</option>
+                            <option value="ACCESORIS">ACCESORIS</option>
+                            <option value="PERDANA">PERDANA</option>
+                            <option value="PPOB">PPOB</option>
+                            <option value="LAIN-LAIN">LAIN-LAIN</option>
+                            <option value="EWALLET">EWALLET</option>
+                            <option value="BANK">BANK</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nominal / Harga (Rp)</label>
+                        <input type="text" id="inUnivHarga" placeholder="23.000" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <!-- FOOTER PROMO -->
+                    <div class="pt-2 border-t border-slate-200">
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Footer / Pesan Promo Spesial</label>
+                        <textarea id="inUnivFooter" rows="2" placeholder="Tulis penawaran spesial / promo..." class="w-full p-2.5 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500 mb-2"></textarea>
+                        <button onclick="saveFooter('universal')" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2 rounded-lg text-xs uppercase tracking-wider flex items-center justify-center space-x-1">
+                            <span>💾</span>
+                            <span>SAVE PROMO FOOTER</span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 pt-2">
+                        <button onclick="window.print()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg shadow-md transition-all text-xs uppercase tracking-wider flex items-center justify-center space-x-1">
+                            <span>🖨️</span>
+                            <span>Cetak Web</span>
+                        </button>
+                        <button onclick="printBluetooth('universal')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-md transition-all text-xs uppercase tracking-wider flex items-center justify-center space-x-1">
+                            <span>📲</span>
+                            <span>Print Bluetooth</span>
+                        </button>
+                    </div>
+                </section>
+
+                <section class="md:col-span-7 space-y-6">
+                    <div class="bg-white p-6 rounded-xl border border-slate-900 shadow-sm print-area">
+                        <h3 class="text-sm font-bold text-slate-700 uppercase mb-4 no-print">Preview Struk Universal</h3>
+                        <div class="rounded-xl p-4 bg-gradient-to-br from-white to-slate-50 thermal-font font-bold max-w-[80mm] mx-auto border border-dashed border-black md:border-none">
+                            
+                            <!-- HEADER LOGO POINN PULSA MONOKROM -->
+                            <div class="flex flex-col items-center justify-center border-b border-black pb-2 mb-3 text-center">
+                                <div class="w-24 h-24 rounded-full bg-black border-2 border-white flex items-center justify-center p-1 mb-1 shadow-sm logo-circle">
+                                    <div class="flex items-center text-left leading-none font-black font-sans tracking-tight">
+                                        <span class="text-white text-4xl font-black leading-none">P</span>
+                                        <div class="flex flex-col -ml-0.5">
+                                            <span class="text-white logo-text-lime text-sm font-black leading-tight">OINN</span>
+                                            <span class="text-white text-sm font-black leading-tight">ULSA</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="text-black font-black text-base block mt-1">STRUK TRANSAKSI UNIVERSAL</span>
+                                <span class="text-xs text-slate-600 block">BUKTI PEMBAYARAN SAH</span>
+                            </div>
+
+                            <div class="space-y-1.5 text-xs text-slate-800">
+                                <div class="flex justify-between"><span>KODE AGEN:</span><span id="outUnivAgen">POIN PULSA_1</span></div>
+                                <div class="flex justify-between"><span>KODE PEMBELIAN:</span><span id="outUnivKodePbl">RE20E</span></div>
+                                <div class="flex justify-between"><span>KATEGORI PRODUK:</span><span id="outUnivKategori">OPERATOR</span></div>
+                                <div class="flex justify-between border-t border-slate-200 pt-1 mt-1"><span>NOMINAL/HARGA:</span><span id="outUnivHarga" class="font-bold text-emerald-700">Rp 23.000</span></div>
+                            </div>
+
+                            <div class="text-center text-[10px] text-slate-600 mt-3 pt-2 border-t border-black">
+                                Terima kasih telah bertransaksi di POINN PULSA.
+                            </div>
+
+                            <!-- FOOTER PROMO TERKUNCI -->
+                            <div id="outUnivPromoBox" class="mt-2 pt-2 border-t border-black text-center hidden">
+                                <span id="outUnivPromo" class="text-[11px] font-bold text-black block uppercase whitespace-pre-line"></span>
+                            </div>
+
+                            <!-- FOOTER WAKTU CETAK INDONESIA LENGKAP -->
+                            <div class="mt-3 pt-2 border-t border-black text-center">
+                                <span id="outUnivPrintTime" class="text-[12px] font-mono font-bold text-slate-800 block uppercase">Waktu Cetak: -</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ================= MODUL 5 (FITUR BARU 2): PRINT LAPORAN ================= -->
+            <div id="moduleLaporan" class="module-content hidden grid grid-cols-1 md:grid-cols-12 gap-6">
+                <section class="md:col-span-5 bg-white p-6 rounded-xl border border-slate-200 shadow-sm no-print space-y-4">
+                    <h2 class="text-base font-bold text-slate-900 uppercase border-b pb-2 flex items-center">
+                        <span class="bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center mr-2">1</span>
+                        Upload Gambar Laporan
+                    </h2>
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Pilih Gambar Laporan</label>
+                        <input type="file" id="uploadImage" accept="image/*" class="w-full text-xs p-2 border border-slate-300 rounded-lg file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    </div>
+
+                    <!-- KONTANER EDIT CROPPER (PANGKAS GAMBAR) -->
+                    <div id="cropperContainer" class="hidden space-y-3 pt-2 border-t border-slate-200">
+                        <h3 class="text-xs font-bold text-slate-700 uppercase">Edit & Pangkas Gambar</h3>
+                        <div class="max-h-64 bg-slate-900 rounded-lg overflow-hidden flex items-center justify-center">
+                            <img id="imageToCrop" class="max-w-full block">
+                        </div>
+                        <button onclick="cropAndApply()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs uppercase tracking-wider flex items-center justify-center space-x-1">
+                            <span>✂️</span>
+                            <span>Pangkas & Terapkan Gambar</span>
+                        </button>
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-200 space-y-2">
+                        <button onclick="window.print()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg shadow-md transition-all text-xs uppercase tracking-wider flex items-center justify-center space-x-1">
+                            <span>🖨️</span>
+                            <span>Cetak Web Laporan</span>
+                        </button>
+                        <button onclick="printBluetooth('laporan')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-md transition-all text-xs uppercase tracking-wider flex items-center justify-center space-x-1">
+                            <span>📲</span>
+                            <span>Print Bluetooth Gambar</span>
+                        </button>
+                    </div>
+                </section>
+
+                <section class="md:col-span-7 space-y-6">
+                    <div class="bg-white p-6 rounded-xl border border-slate-900 shadow-sm print-area">
+                        <h3 class="text-sm font-bold text-slate-700 uppercase mb-4 no-print">Preview Cetak Gambar Laporan (80mm)</h3>
+                        <div class="rounded-xl p-4 bg-white thermal-font font-bold max-w-[80mm] mx-auto border border-dashed border-black md:border-none text-center">
+                            
+                            <div id="emptyImageState" class="py-12 border-2 border-dashed border-slate-300 rounded-lg text-slate-400">
+                                <span class="text-3xl block mb-1">🖼️</span>
+                                <span class="text-xs">Gambar Laporan Belum Diupload</span>
+                            </div>
+
+                            <div id="previewImageWrapper" class="hidden">
+                                <img id="croppedResultImage" class="w-full h-auto object-contain mx-auto border border-black p-1">
+                            </div>
+
+                            <div class="mt-4 pt-2 border-t border-black text-center">
+                                <span id="outLapPrintTime" class="text-[12px] font-mono font-bold text-slate-800 block uppercase">Waktu Cetak: -</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
         </main>
     </div>
 
     <!-- Script Application Logic & Bluetooth Integration -->
     <script>
-        // variabel global bluetooth
+        // Variabel global bluetooth & cropper
         let bluetoothDevice = null;
         let bluetoothGattCharacteristic = null;
+        let cropper = null;
 
         document.addEventListener('DOMContentLoaded', () => {
 
@@ -576,7 +759,7 @@
 
             function updateAllPrintTimes() {
                 const timeString = getFormattedNow();
-                ['outTokPrintTime', 'outTrfPrintTime', 'outPrintTime'].forEach(id => {
+                ['outTokPrintTime', 'outTrfPrintTime', 'outPrintTime', 'outUnivPrintTime', 'outLapPrintTime'].forEach(id => {
                     const el = document.getElementById(id);
                     if (el) el.textContent = timeString;
                 });
@@ -620,39 +803,26 @@
                 const elKode = document.getElementById('inTokKode');
 
                 const agenMatch = text.match(/Agen\s+([^,]+)/i);
-                if (agenMatch && elAgen) {
-                    elAgen.value = agenMatch[1].trim();
-                }
+                if (agenMatch && elAgen) elAgen.value = agenMatch[1].trim();
 
                 const idMatch = text.match(/(?:PLN\d*|IDPEL)?[\.\s]*(\d{11,12})/i);
-                if (idMatch && elIdPel) {
-                    elIdPel.value = idMatch[1].trim();
-                }
+                if (idMatch && elIdPel) elIdPel.value = idMatch[1].trim();
 
                 const hrgMatch = text.match(/Hrg\s*=\s*(\d+)/i) || text.match(/Hrg\s*(\d+)/i);
-                if (hrgMatch && elNominal) {
-                    elNominal.value = formatRupiah(hrgMatch[1].trim());
-                }
+                if (hrgMatch && elNominal) elNominal.value = formatRupiah(hrgMatch[1].trim());
 
                 const snIndex = text.indexOf("SN:");
                 if (snIndex !== -1) {
                     const snContent = text.substring(snIndex + 3).trim();
                     const parts = snContent.split('/');
 
-                    if (parts.length >= 1 && elKode) {
-                        elKode.value = parts[0].trim();
-                    }
-
-                    if (parts.length >= 2 && elNama) {
-                        elNama.value = parts[1].trim().replace(/-/g, ' ');
-                    }
+                    if (parts.length >= 1 && elKode) elKode.value = parts[0].trim();
+                    if (parts.length >= 2 && elNama) elNama.value = parts[1].trim().replace(/-/g, ' ');
 
                     if (parts.length >= 4) {
                         const lastPart = parts[parts.length - 1].trim();
                         const kwhMatch = lastPart.match(/^([\d\.\,]+)/);
-                        if (kwhMatch && elKwh) {
-                            elKwh.value = kwhMatch[1] + " kWh";
-                        }
+                        if (kwhMatch && elKwh) elKwh.value = kwhMatch[1] + " kWh";
                     }
 
                     let tarifStr = "", dayaStr = "";
@@ -666,13 +836,9 @@
                     }
 
                     if (elDaya) {
-                        if (tarifStr && dayaStr) {
-                            elDaya.value = `${tarifStr} / ${dayaStr} VA`;
-                        } else if (dayaStr) {
-                            elDaya.value = `${dayaStr} VA`;
-                        } else if (tarifStr) {
-                            elDaya.value = tarifStr;
-                        }
+                        if (tarifStr && dayaStr) elDaya.value = `${tarifStr} / ${dayaStr} VA`;
+                        else if (dayaStr) elDaya.value = `${dayaStr} VA`;
+                        else if (tarifStr) elDaya.value = tarifStr;
                     }
                 }
 
@@ -734,9 +900,7 @@
                 const elNama = document.getElementById('inTrfNama');
 
                 const agenMatch = text.match(/Agen\s+([^,]+)/i);
-                if (agenMatch && elAgen) {
-                    elAgen.value = agenMatch[1].trim();
-                }
+                if (agenMatch && elAgen) elAgen.value = agenMatch[1].trim();
 
                 const pblMatch = text.match(/Pembelian\s+([A-Za-z0-9]+)\.(\d+)\s+Hrg=/i);
                 if (pblMatch) {
@@ -830,9 +994,7 @@
                 });
             }
 
-            if (bankSelect) {
-                bankSelect.addEventListener('change', updateTransferStruk);
-            }
+            if (bankSelect) bankSelect.addEventListener('change', updateTransferStruk);
 
             const inTrfNominal = document.getElementById('inTrfNominal');
             if (inTrfNominal) {
@@ -894,18 +1056,127 @@
                 if (el) el.addEventListener('input', updateVoucher);
             });
 
+            // ================= LOGIKA LOGIKA MODUL 4: PRINT UNIVERSAL =================
+            const rawUnivText = document.getElementById('rawUnivText');
+            if (rawUnivText) {
+                rawUnivText.addEventListener('input', parseUniversalReport);
+            }
+
+            function parseUniversalReport() {
+                if (!rawUnivText) return;
+                const text = rawUnivText.value.trim();
+                if (!text) return;
+
+                const elAgen = document.getElementById('inUnivAgen');
+                const elKodePbl = document.getElementById('inUnivKodePbl');
+                const elHarga = document.getElementById('inUnivHarga');
+
+                // Baca KODE AGEN
+                const agenMatch = text.match(/Agen\s+([^,]+)/i);
+                if (agenMatch && elAgen) elAgen.value = agenMatch[1].trim();
+
+                // Baca KODE PEMBELIAN (Contoh: Pembelian RE20E.089602035849)
+                const pblMatch = text.match(/Pembelian\s+([A-Za-z0-9]+)\./i) || text.match(/Pembelian\s+([A-Za-z0-9]+)/i);
+                if (pblMatch && elKodePbl) elKodePbl.value = pblMatch[1].trim();
+
+                // Baca HARGA
+                const hrgMatch = text.match(/Hrg\s*=\s*(\d+)/i) || text.match(/Hrg\s*(\d+)/i);
+                if (hrgMatch && elHarga) elHarga.value = formatRupiah(hrgMatch[1].trim());
+
+                updateUniversalStruk();
+            }
+
+            function updateUniversalStruk() {
+                const outAgen = document.getElementById('outUnivAgen');
+                const outKodePbl = document.getElementById('outUnivKodePbl');
+                const outKategori = document.getElementById('outUnivKategori');
+                const outHarga = document.getElementById('outUnivHarga');
+
+                if (outAgen) outAgen.textContent = document.getElementById('inUnivAgen')?.value || '-';
+                if (outKodePbl) outKodePbl.textContent = document.getElementById('inUnivKodePbl')?.value || '-';
+                if (outKategori) outKategori.textContent = document.getElementById('inUnivKategori')?.value || '-';
+                if (outHarga) {
+                    const val = document.getElementById('inUnivHarga')?.value;
+                    outHarga.textContent = val ? 'Rp ' + val : 'Rp -';
+                }
+            }
+
+            bindInput('inUnivAgen', 'outUnivAgen');
+            bindInput('inUnivKodePbl', 'outUnivKodePbl');
+            
+            const inUnivKategori = document.getElementById('inUnivKategori');
+            if (inUnivKategori) inUnivKategori.addEventListener('change', updateUniversalStruk);
+
+            const inUnivHarga = document.getElementById('inUnivHarga');
+            if (inUnivHarga) {
+                inUnivHarga.addEventListener('input', (e) => {
+                    e.target.value = formatRupiah(e.target.value);
+                    updateUniversalStruk();
+                });
+            }
+
+            // ================= LOGIKA MODUL 5: PRINT LAPORAN (UPLOAD & CROP) =================
+            const uploadImage = document.getElementById('uploadImage');
+            const imageToCrop = document.getElementById('imageToCrop');
+            const cropperContainer = document.getElementById('cropperContainer');
+
+            if (uploadImage) {
+                uploadImage.addEventListener('change', function (e) {
+                    const files = e.target.files;
+                    if (files && files.length > 0) {
+                        const file = files[0];
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            imageToCrop.src = e.target.result;
+                            cropperContainer.classList.remove('hidden');
+
+                            if (cropper) {
+                                cropper.destroy();
+                            }
+
+                            cropper = new Cropper(imageToCrop, {
+                                viewMode: 1,
+                                autoCropArea: 1,
+                                responsive: true
+                            });
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+
             // Initial Update
             updateTokenStruk();
             updateTransferStruk();
             updateVoucher();
+            updateUniversalStruk();
         });
+
+        // PANGKAS & TERAPKAN GAMBAR
+        function cropAndApply() {
+            if (!cropper) return;
+            const canvas = cropper.getCroppedCanvas();
+            if (canvas) {
+                const croppedDataUrl = canvas.toDataURL();
+                const croppedResultImage = document.getElementById('croppedResultImage');
+                const emptyState = document.getElementById('emptyImageState');
+                const wrapper = document.getElementById('previewImageWrapper');
+
+                if (croppedResultImage) croppedResultImage.src = croppedDataUrl;
+                if (emptyState) emptyState.classList.add('hidden');
+                if (wrapper) wrapper.classList.remove('hidden');
+
+                alert('Gambar berhasil dipangkas dan diterapkan ke preview!');
+            }
+        }
 
         // ================= LOGIKA PROMO FOOTER =================
         function setupFooterListeners() {
             const map = [
                 { in: 'inTokFooter', out: 'outTokPromo', box: 'outTokPromoBox' },
                 { in: 'inTrfFooter', out: 'outTrfPromo', box: 'outTrfPromoBox' },
-                { in: 'inVouFooter', out: 'outVouPromo', box: 'outVouPromoBox' }
+                { in: 'inVouFooter', out: 'outVouPromo', box: 'outVouPromoBox' },
+                { in: 'inUnivFooter', out: 'outUnivPromo', box: 'outUnivPromoBox' }
             ];
 
             map.forEach(item => {
@@ -925,19 +1196,19 @@
         }
 
         function saveFooter(type) {
-            let inId = type === 'token' ? 'inTokFooter' : type === 'transfer' ? 'inTrfFooter' : 'inVouFooter';
+            let inId = type === 'token' ? 'inTokFooter' : type === 'transfer' ? 'inTrfFooter' : type === 'voucher' ? 'inVouFooter' : 'inUnivFooter';
             const val = document.getElementById(inId)?.value || '';
             localStorage.setItem('promo_footer_' + type, val);
             alert('Promo Footer berhasil disimpan!');
         }
 
         function loadSavedFooters() {
-            ['token', 'transfer', 'voucher'].forEach(type => {
+            ['token', 'transfer', 'voucher', 'universal'].forEach(type => {
                 const val = localStorage.getItem('promo_footer_' + type);
                 if (val !== null) {
-                    let inId = type === 'token' ? 'inTokFooter' : type === 'transfer' ? 'inTrfFooter' : 'inVouFooter';
-                    let outId = type === 'token' ? 'outTokPromo' : type === 'transfer' ? 'outTrfPromo' : 'outVouPromo';
-                    let boxId = type === 'token' ? 'outTokPromoBox' : type === 'transfer' ? 'outTrfPromoBox' : 'outVouPromoBox';
+                    let inId = type === 'token' ? 'inTokFooter' : type === 'transfer' ? 'inTrfFooter' : type === 'voucher' ? 'inVouFooter' : 'inUnivFooter';
+                    let outId = type === 'token' ? 'outTokPromo' : type === 'transfer' ? 'outTrfPromo' : type === 'voucher' ? 'outVouPromo' : 'outUnivPromo';
+                    let boxId = type === 'token' ? 'outTokPromoBox' : type === 'transfer' ? 'outTrfPromoBox' : type === 'voucher' ? 'outVouPromoBox' : 'outUnivPromoBox';
 
                     const inEl = document.getElementById(inId);
                     const outEl = document.getElementById(outId);
@@ -1006,12 +1277,10 @@
             }
 
             try {
-                // ESC/POS Commands
                 const ESC = '\x1B';
                 const GS = '\x1D';
                 
-                let init = ESC + '@'; // Reset
-                let alignCenter = ESC + 'a' + '\x01';
+                let init = ESC + '@'; 
                 let alignLeft = ESC + 'a' + '\x00';
                 
                 let printBuffer = init + alignLeft + textData + '\n\n\n\n' + GS + 'V' + '\x41' + '\x03'; 
@@ -1019,7 +1288,6 @@
                 const encoder = new TextEncoder();
                 const data = encoder.encode(printBuffer);
 
-                // Kirim secara bertahap (chunking)
                 const chunkSize = 100;
                 for (let i = 0; i < data.length; i += chunkSize) {
                     const chunk = data.slice(i, i + chunkSize);
@@ -1103,6 +1371,31 @@
                 }
                 str += sep;
                 str += (document.getElementById('outPrintTime')?.textContent || '') + "\n";
+
+            } else if (type === 'universal') {
+                str += "          POINN PULSA          \n";
+                str += "    STRUK TRANSAKSI UNIVERSAL  \n";
+                str += "      BUKTI PEMBAYARAN SAH     \n";
+                str += sep;
+                str += "KODE AGEN    : " + (document.getElementById('outUnivAgen')?.textContent || '-') + "\n";
+                str += "KODE PEMBELIAN: " + (document.getElementById('outUnivKodePbl')?.textContent || '-') + "\n";
+                str += "KATEGORI     : " + (document.getElementById('outUnivKategori')?.textContent || '-') + "\n";
+                str += "HARGA        : " + (document.getElementById('outUnivHarga')?.textContent || '-') + "\n";
+                str += sep;
+                str += "Terima kasih telah bertransaksi di POINN PULSA.\n";
+
+                const promo = document.getElementById('outUnivPromo')?.textContent;
+                if (promo) {
+                    str += sep;
+                    str += promo + "\n";
+                }
+                str += sep;
+                str += (document.getElementById('outUnivPrintTime')?.textContent || '') + "\n";
+
+            } else if (type === 'laporan') {
+                alert("Untuk cetak Gambar Laporan via printer Web/Thermal, silakan gunakan tombol 'Cetak Web Laporan'.");
+                window.print();
+                return;
             }
 
             sendToPrinter(str);
@@ -1111,20 +1404,24 @@
         function switchTab(tabName) {
             document.querySelectorAll('.module-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.className = "tab-btn p-4 rounded-xl border-2 font-bold flex items-center justify-center space-x-3 transition-all duration-200 bg-white border-slate-200 text-slate-700 hover:border-blue-400";
+                btn.className = "tab-btn p-3 rounded-xl border-2 font-bold flex items-center justify-center space-x-2 transition-all duration-200 bg-white border-slate-200 text-slate-700 hover:border-blue-400";
             });
 
             const targetModule = document.getElementById(
                 tabName === 'token' ? 'moduleToken' : 
-                tabName === 'transfer' ? 'moduleTransfer' : 'moduleVoucher'
+                tabName === 'transfer' ? 'moduleTransfer' : 
+                tabName === 'voucher' ? 'moduleVoucher' : 
+                tabName === 'universal' ? 'moduleUniversal' : 'moduleLaporan'
             );
             const targetBtn = document.getElementById(
                 tabName === 'token' ? 'btnTabToken' : 
-                tabName === 'transfer' ? 'btnTabTransfer' : 'btnTabVoucher'
+                tabName === 'transfer' ? 'btnTabTransfer' : 
+                tabName === 'voucher' ? 'btnTabVoucher' : 
+                tabName === 'universal' ? 'btnTabUniversal' : 'btnTabLaporan'
             );
 
             if (targetModule) targetModule.classList.remove('hidden');
-            if (targetBtn) targetBtn.className = "tab-btn p-4 rounded-xl border-2 font-bold flex items-center justify-center space-x-3 transition-all duration-200 bg-blue-600 border-blue-600 text-white shadow-md";
+            if (targetBtn) targetBtn.className = "tab-btn p-3 rounded-xl border-2 font-bold flex items-center justify-center space-x-2 transition-all duration-200 bg-blue-600 border-blue-600 text-white shadow-md";
         }
 
         function handleLogin(e) {
