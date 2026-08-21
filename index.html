@@ -6,9 +6,6 @@
     <title>Sistem Cetak Struk Online</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Cropper.js CSS & JS untuk Fitur Pangkas Gambar di Print Laporan -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"/>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <style>
         /* Font A Thermal Printer Standard (Monospace/Courier) */
         .thermal-font {
@@ -98,8 +95,8 @@
 
             <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">ID Pengguna</label>
-                    <input type="text" id="loginId" required placeholder="Masukkan ID..." class="w-full p-3 border border-slate-300 rounded-lg text-sm font-semibold focus:ring-2 focus:ring-blue-500 outline-none">
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Username / Kode Toko</label>
+                    <input type="text" id="loginId" required placeholder="Contoh: POINNPULSA_1" class="w-full p-3 border border-slate-300 rounded-lg text-sm font-semibold focus:ring-2 focus:ring-blue-500 outline-none">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Password</label>
@@ -127,7 +124,10 @@
                         </div>
                     </div>
                 </div>
-                <h1 class="text-xl font-black text-sky-400">StrukPrint <span class="text-rose-500">Online</span></h1>
+                <div>
+                    <h1 class="text-xl font-black text-sky-400">StrukPrint <span class="text-rose-500">Online</span></h1>
+                    <p class="text-xs text-slate-400">Kode Agen: <span id="displayUserAgent" class="font-bold text-white">-</span></p>
+                </div>
             </div>
             <div class="flex items-center space-x-3">
                 <!-- Tombol Koneksi Bluetooth -->
@@ -141,7 +141,7 @@
             </div>
         </header>
 
-        <!-- NAVIGASI TAB MENU (DITAMBAHKAN 2 MENU BARU) -->
+        <!-- NAVIGASI TAB MENU -->
         <nav class="max-w-6xl mx-auto mb-6 grid grid-cols-2 md:grid-cols-5 gap-3 no-print">
             <button onclick="switchTab('token')" id="btnTabToken" class="tab-btn p-3 rounded-xl border-2 font-bold flex items-center justify-center space-x-2 transition-all duration-200 bg-blue-600 border-blue-600 text-white shadow-md">
                 <span class="text-xl">⚡</span>
@@ -155,14 +155,12 @@
                 <span class="text-xl">📲</span>
                 <span class="text-xs uppercase tracking-wide">Print Voucher</span>
             </button>
-            <!-- FITUR BARU 1 -->
             <button onclick="switchTab('universal')" id="btnTabUniversal" class="tab-btn p-3 rounded-xl border-2 font-bold flex items-center justify-center space-x-2 transition-all duration-200 bg-white border-slate-200 text-slate-700 hover:border-blue-400">
                 <span class="text-xl">🌐</span>
                 <span class="text-xs uppercase tracking-wide">Print Universal</span>
             </button>
-            <!-- FITUR BARU 2 -->
             <button onclick="switchTab('laporan')" id="btnTabLaporan" class="tab-btn p-3 rounded-xl border-2 font-bold flex items-center justify-center space-x-2 transition-all duration-200 bg-white border-slate-200 text-slate-700 hover:border-blue-400 col-span-2 md:col-span-1">
-                <span class="text-xl">🖼️</span>
+                <span class="text-xl">📄</span>
                 <span class="text-xs uppercase tracking-wide">Print Laporan</span>
             </button>
         </nav>
@@ -178,7 +176,7 @@
                             Tempelkan Bukti Transaksi
                         </h2>
                         <textarea id="rawTokenText" rows="3" placeholder="Tempelkan teks laporan transaksi di sini..." class="w-full p-2.5 border border-blue-300 rounded-lg text-xs font-mono bg-white outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-                        <p class="text-[11px] text-blue-700 font-medium">*Data Agen, ID, Nama, Daya, kWh, Harga, & Token otomatis terisi.</p>
+                        <p class="text-[11px] text-blue-700 font-medium">*Data ID, Nama, Daya, kWh, Harga, & Token otomatis terisi.</p>
                     </div>
 
                     <h2 class="text-base font-bold text-slate-900 uppercase border-b pb-2 pt-2 flex items-center">
@@ -187,8 +185,8 @@
                     </h2>
 
                     <div>
-                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Kode Agen</label>
-                        <input type="text" id="inTokAgen" placeholder="-" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Kode Agen (Terkunci)</label>
+                        <input type="text" id="inTokAgen" readonly class="w-full p-2.5 border border-slate-200 bg-slate-100 text-slate-500 rounded-lg text-sm font-bold outline-none cursor-not-allowed">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">ID PLN / No Meter</label>
@@ -297,7 +295,7 @@
                             Tempelkan Bukti Transaksi
                         </h2>
                         <textarea id="rawTrfText" rows="3" placeholder="Tempel teks laporan transaksi di sini..." class="w-full p-2.5 border border-blue-300 rounded-lg text-xs font-mono bg-white outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-                        <p class="text-[11px] text-blue-700 font-medium">*Kode Agen, Bank, No. Rekening, & Nama otomatis terisi.</p>
+                        <p class="text-[11px] text-blue-700 font-medium">*Bank, No. Rekening, & Nama otomatis terisi.</p>
                     </div>
 
                     <h2 class="text-base font-bold text-slate-900 uppercase border-b pb-2 pt-2 flex items-center">
@@ -306,8 +304,8 @@
                     </h2>
 
                     <div>
-                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Kode Agen</label>
-                        <input type="text" id="inTrfAgen" placeholder="-" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Kode Agen (Terkunci)</label>
+                        <input type="text" id="inTrfAgen" readonly class="w-full p-2.5 border border-slate-200 bg-slate-100 text-slate-500 rounded-lg text-sm font-bold outline-none cursor-not-allowed">
                     </div>
 
                     <div>
@@ -551,7 +549,7 @@
                 </section>
             </div>
 
-            <!-- ================= MODUL 4 (FITUR BARU 1): PRINT UNIVERSAL ================= -->
+            <!-- ================= MODUL 4: PRINT UNIVERSAL ================= -->
             <div id="moduleUniversal" class="module-content hidden grid grid-cols-1 md:grid-cols-12 gap-6">
                 <section class="md:col-span-5 bg-white p-6 rounded-xl border border-slate-200 shadow-sm no-print space-y-4">
                     <div class="bg-blue-50/70 p-4 rounded-xl border border-blue-200 space-y-2">
@@ -560,7 +558,7 @@
                             Tempelkan Report Transaksi
                         </h2>
                         <textarea id="rawUnivText" rows="3" placeholder="Contoh: >>ALL TRANSAKSI LANCARRR<< Agen POIN PULSA_1, Pembelian RE20E.089602035849 Hrg=23000 telah berhasil. Saldo Rp.(Awal 627253 Akhir 604253)" class="w-full p-2.5 border border-blue-300 rounded-lg text-xs font-mono bg-white outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-                        <p class="text-[11px] text-blue-700 font-medium">*Kode Agen, Kode Pembelian, & Nominal terisi otomatis saat ditempel.</p>
+                        <p class="text-[11px] text-blue-700 font-medium">*Kode Pembelian & Nominal terisi otomatis saat ditempel.</p>
                     </div>
 
                     <h2 class="text-base font-bold text-slate-900 uppercase border-b pb-2 pt-2 flex items-center">
@@ -569,8 +567,8 @@
                     </h2>
 
                     <div>
-                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Kode Agen</label>
-                        <input type="text" id="inUnivAgen" placeholder="POIN PULSA_1" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Kode Agen (Terkunci)</label>
+                        <input type="text" id="inUnivAgen" readonly class="w-full p-2.5 border border-slate-200 bg-slate-100 text-slate-500 rounded-lg text-sm font-bold outline-none cursor-not-allowed">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Kode Pembelian</label>
@@ -636,7 +634,7 @@
                             </div>
 
                             <div class="space-y-1.5 text-xs text-slate-800">
-                                <div class="flex justify-between"><span>KODE AGEN:</span><span id="outUnivAgen">POIN PULSA_1</span></div>
+                                <div class="flex justify-between"><span>KODE AGEN:</span><span id="outUnivAgen">-</span></div>
                                 <div class="flex justify-between"><span>KODE PEMBELIAN:</span><span id="outUnivKodePbl">RE20E</span></div>
                                 <div class="flex justify-between"><span>KATEGORI PRODUK:</span><span id="outUnivKategori">OPERATOR</span></div>
                                 <div class="flex justify-between border-t border-slate-200 pt-1 mt-1"><span>NOMINAL/HARGA:</span><span id="outUnivHarga" class="font-bold text-emerald-700">Rp 23.000</span></div>
@@ -660,29 +658,76 @@
                 </section>
             </div>
 
-            <!-- ================= MODUL 5 (FITUR BARU 2): PRINT LAPORAN ================= -->
+            <!-- ================= MODUL 5: PRINT LAPORAN (UPDATED) ================= -->
             <div id="moduleLaporan" class="module-content hidden grid grid-cols-1 md:grid-cols-12 gap-6">
                 <section class="md:col-span-5 bg-white p-6 rounded-xl border border-slate-200 shadow-sm no-print space-y-4">
-                    <h2 class="text-base font-bold text-slate-900 uppercase border-b pb-2 flex items-center">
-                        <span class="bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center mr-2">1</span>
-                        Upload Gambar Laporan
-                    </h2>
                     
-                    <div>
-                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Pilih Gambar Laporan</label>
-                        <input type="file" id="uploadImage" accept="image/*" class="w-full text-xs p-2 border border-slate-300 rounded-lg file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                    </div>
-
-                    <!-- KONTANER EDIT CROPPER (PANGKAS GAMBAR) -->
-                    <div id="cropperContainer" class="hidden space-y-3 pt-2 border-t border-slate-200">
-                        <h3 class="text-xs font-bold text-slate-700 uppercase">Edit & Pangkas Gambar</h3>
-                        <div class="max-h-64 bg-slate-900 rounded-lg overflow-hidden flex items-center justify-center">
-                            <img id="imageToCrop" class="max-w-full block">
+                    <!-- FORM INPUT LAPORAN -->
+                    <div id="reportFormContainer" class="space-y-3">
+                        <h2 class="text-xs font-bold text-blue-900 uppercase bg-blue-50 p-2 rounded border border-blue-200">Header Laporan</h2>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-600">Nama Staff</label>
+                                <input type="text" id="inRepNama" value="RIDWAN KUSWARA" class="w-full p-2 border border-slate-300 rounded text-xs font-semibold">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-600">Tanggal (Terkunci)</label>
+                                <input type="text" id="inRepTgl" readonly class="w-full p-2 border border-slate-200 bg-slate-100 text-slate-500 rounded text-xs font-semibold outline-none cursor-not-allowed">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-600">Outlet (Terkunci)</label>
+                                <input type="text" id="inRepOutlet" readonly class="w-full p-2 border border-slate-200 bg-slate-100 text-slate-500 rounded text-xs font-semibold outline-none cursor-not-allowed">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-600">Shift</label>
+                                <input type="text" id="inRepShift" value="Shift 2" class="w-full p-2 border border-slate-300 rounded text-xs font-semibold">
+                            </div>
                         </div>
-                        <button onclick="cropAndApply()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs uppercase tracking-wider flex items-center justify-center space-x-1">
-                            <span>✂️</span>
-                            <span>Pangkas & Terapkan Gambar</span>
-                        </button>
+
+                        <h2 class="text-xs font-bold text-blue-900 uppercase bg-blue-50 p-2 rounded border border-blue-200 mt-2">1. Pendapatan</h2>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div>
+                                <label class="block text-[10px] text-slate-600">Elektrik (Rp)</label>
+                                <input type="text" id="inRepElektrik" value="6.907.000" class="rep-calc w-full p-1.5 border border-slate-300 rounded">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-600">Fisik (Qty)</label>
+                                <input type="text" id="inRepFisik" value="45" class="rep-calc w-full p-1.5 border border-slate-300 rounded">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-600">Saldo Agen (Rp)</label>
+                                <input type="text" id="inRepSaldoAgen" placeholder="0" class="rep-calc w-full p-1.5 border border-slate-300 rounded">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-600">Transaksi Lain (Rp)</label>
+                                <input type="text" id="inRepTrxLain" placeholder="0" class="rep-calc w-full p-1.5 border border-slate-300 rounded">
+                            </div>
+                        </div>
+
+                        <!-- DINAMIS ADDITIONAL PENGELUARAN DENGAN DROPDOWN -->
+                        <div class="flex justify-between items-center bg-blue-50 p-2 rounded border border-blue-200 mt-2">
+                            <h2 class="text-xs font-bold text-blue-900 uppercase">2. Pengeluaran</h2>
+                            <button onclick="addExpenseRow()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-2 py-1 rounded text-[10px] uppercase flex items-center space-x-1">
+                                <span>➕</span>
+                                <span>Tambah Pengeluaran</span>
+                            </button>
+                        </div>
+
+                        <div id="expenseListContainer" class="space-y-2">
+                            <!-- Baris Pengeluaran Dinamis Akan Diberikan oleh JavaScript -->
+                        </div>
+
+                        <h2 class="text-xs font-bold text-blue-900 uppercase bg-blue-50 p-2 rounded border border-blue-200 mt-2">3. Rincian Fisik Uang (Lembar/Pcs)</h2>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div><label class="block text-[10px] text-slate-600">Rp 100.000</label><input type="number" id="qty100k" value="30" class="cash-calc w-full p-1.5 border border-slate-300 rounded"></div>
+                            <div><label class="block text-[10px] text-slate-600">Rp 50.000</label><input type="number" id="qty50k" value="18" class="cash-calc w-full p-1.5 border border-slate-300 rounded"></div>
+                            <div><label class="block text-[10px] text-slate-600">Rp 20.000</label><input type="number" id="qty20k" value="1" class="cash-calc w-full p-1.5 border border-slate-300 rounded"></div>
+                            <div><label class="block text-[10px] text-slate-600">Rp 10.000</label><input type="number" id="qty10k" value="3" class="cash-calc w-full p-1.5 border border-slate-300 rounded"></div>
+                            <div><label class="block text-[10px] text-slate-600">Rp 5.000</label><input type="number" id="qty5k" value="1" class="cash-calc w-full p-1.5 border border-slate-300 rounded"></div>
+                            <div><label class="block text-[10px] text-slate-600">Rp 2.000</label><input type="number" id="qty2k" value="3" class="cash-calc w-full p-1.5 border border-slate-300 rounded"></div>
+                            <div><label class="block text-[10px] text-slate-600">Rp 1.000</label><input type="number" id="qty1k" value="1" class="cash-calc w-full p-1.5 border border-slate-300 rounded"></div>
+                            <div><label class="block text-[10px] text-slate-600">Receh (Total Rp)</label><input type="text" id="valReceh" placeholder="0" class="rep-calc w-full p-1.5 border border-slate-300 rounded"></div>
+                        </div>
                     </div>
 
                     <div class="pt-4 border-t border-slate-200 space-y-2">
@@ -692,23 +737,99 @@
                         </button>
                         <button onclick="printBluetooth('laporan')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-md transition-all text-xs uppercase tracking-wider flex items-center justify-center space-x-1">
                             <span>📲</span>
-                            <span>Print Bluetooth Gambar</span>
+                            <span>Print Bluetooth</span>
                         </button>
                     </div>
                 </section>
 
                 <section class="md:col-span-7 space-y-6">
                     <div class="bg-white p-6 rounded-xl border border-slate-900 shadow-sm print-area">
-                        <h3 class="text-sm font-bold text-slate-700 uppercase mb-4 no-print">Preview Cetak Gambar Laporan (80mm)</h3>
-                        <div class="rounded-xl p-4 bg-white thermal-font font-bold max-w-[80mm] mx-auto border border-dashed border-black md:border-none text-center">
+                        <h3 class="text-sm font-bold text-slate-700 uppercase mb-4 no-print">Preview Cetak Laporan (80mm)</h3>
+                        <div class="rounded-xl p-4 bg-white thermal-font font-bold max-w-[80mm] mx-auto border border-dashed border-black md:border-none">
                             
-                            <div id="emptyImageState" class="py-12 border-2 border-dashed border-slate-300 rounded-lg text-slate-400">
-                                <span class="text-3xl block mb-1">🖼️</span>
-                                <span class="text-xs">Gambar Laporan Belum Diupload</span>
-                            </div>
+                            <!-- PREVIEW TEXT LAPORAN -->
+                            <div id="previewReportForm" class="space-y-2 text-xs text-black">
+                                <div class="text-center border-b border-black pb-2 mb-2">
+                                    <span class="block font-black text-sm uppercase">LAPORAN PENJUALAN</span>
+                                    <span id="outRepNama" class="block text-xs font-bold">Nama: RIDWAN KUSWARA</span>
+                                    <div class="flex justify-between text-[10px] mt-1">
+                                        <span id="outRepTgl">Tgl: -</span>
+                                        <span id="outRepOutlet">-</span>
+                                        <span id="outRepShift">Shift 2</span>
+                                    </div>
+                                </div>
 
-                            <div id="previewImageWrapper" class="hidden">
-                                <img id="croppedResultImage" class="w-full h-auto object-contain mx-auto border border-black p-1">
+                                <!-- TABEL PENDAPATAN -->
+                                <div class="border-b border-black pb-1">
+                                    <span class="block text-[11px] font-black underline mb-1">1. PENDAPATAN</span>
+                                    <div class="flex justify-between"><span>Elektrik:</span><span id="outRepElektrik">Rp 6.907.000</span></div>
+                                    <div class="flex justify-between"><span>Fisik (Qty):</span><span id="outRepFisik">45</span></div>
+                                    <div class="flex justify-between"><span>Saldo Agen:</span><span id="outRepSaldoAgen">Rp 0</span></div>
+                                    <div class="flex justify-between"><span>Trx Lain:</span><span id="outRepTrxLain">Rp 0</span></div>
+                                    <div class="flex justify-between font-black border-t border-dashed border-black mt-1 pt-0.5">
+                                        <span>TOTAL PENDAPATAN:</span><span id="outTotPendapatan">Rp 6.907.000</span>
+                                    </div>
+                                </div>
+
+                                <!-- TABEL PENGELUARAN DINAMIS -->
+                                <div class="border-b border-black pb-1">
+                                    <span class="block text-[11px] font-black underline mb-1">2. PENGELUARAN</span>
+                                    <div id="outExpenseList" class="space-y-0.5">
+                                        <!-- Item Pengeluaran Dinamis Tampil di Sini -->
+                                    </div>
+                                    <div class="flex justify-between font-black border-t border-dashed border-black mt-1 pt-0.5">
+                                        <span>TOTAL PENGELUARAN:</span><span id="outTotPengeluaran">Rp 0</span>
+                                    </div>
+                                </div>
+
+                                <!-- TOTAL PENJUALAN NETT -->
+                                <div class="flex justify-between font-black text-sm border-b-2 border-black pb-1">
+                                    <span>TOTAL PENJUALAN:</span>
+                                    <span id="outNetPenjualan">Rp 0</span>
+                                </div>
+
+                                <!-- TABEL RINCIAN FISIK UANG -->
+                                <div class="border-b border-black pb-1">
+                                    <span class="block text-[11px] font-black underline mb-1">3. RINCIAN FISIK UANG</span>
+                                    <div class="grid grid-cols-12 text-[11px]">
+                                        <span class="col-span-5">100.000 x <span id="outQ100">30</span></span><span class="col-span-7 text-right" id="outV100">Rp 3.000.000</span>
+                                        <span class="col-span-5">50.000 x <span id="outQ50">18</span></span><span class="col-span-7 text-right" id="outV50">Rp 900.000</span>
+                                        <span class="col-span-5">20.000 x <span id="outQ20">1</span></span><span class="col-span-7 text-right" id="outV20">Rp 20.000</span>
+                                        <span class="col-span-5">10.000 x <span id="outQ10">3</span></span><span class="col-span-7 text-right" id="outV10">Rp 30.000</span>
+                                        <span class="col-span-5">5.000 x <span id="outQ5">1</span></span><span class="col-span-7 text-right" id="outV5">Rp 5.000</span>
+                                        <span class="col-span-5">2.000 x <span id="outQ2">3</span></span><span class="col-span-7 text-right" id="outV2">Rp 6.000</span>
+                                        <span class="col-span-5">1.000 x <span id="outQ1">1</span></span><span class="col-span-7 text-right" id="outV1">Rp 1.000</span>
+                                        <span class="col-span-5">Receh</span><span class="col-span-7 text-right" id="outVReceh">Rp 0</span>
+                                    </div>
+                                    <div class="flex justify-between font-black border-t border-dashed border-black mt-1 pt-0.5">
+                                        <span>TOTAL FISIK:</span><span id="outTotFisik">Rp 3.962.000</span>
+                                    </div>
+                                </div>
+
+                                <!-- PLUS MINUS -->
+                                <div class="flex justify-between font-black text-sm my-2 p-1 border border-black bg-slate-50">
+                                    <span>PLUS MINUS:</span>
+                                    <span id="outPlusMinus">Rp 0</span>
+                                </div>
+
+                                <!-- TANDA TANGAN -->
+                                <div class="grid grid-cols-3 text-center text-[9px] pt-2 border-t border-black">
+                                    <div>
+                                        <span>TTD PEMBERI</span>
+                                        <div class="h-10"></div>
+                                        <span>(..........)</span>
+                                    </div>
+                                    <div>
+                                        <span>TTD PENERIMA</span>
+                                        <div class="h-10"></div>
+                                        <span>(..........)</span>
+                                    </div>
+                                    <div>
+                                        <span>TTD ADMIN</span>
+                                        <div class="h-10"></div>
+                                        <span>(..........)</span>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="mt-4 pt-2 border-t border-black text-center">
@@ -724,24 +845,149 @@
 
     <!-- Script Application Logic & Bluetooth Integration -->
     <script>
-        // Variabel global bluetooth & cropper
+        // Global Variables
         let bluetoothDevice = null;
         let bluetoothGattCharacteristic = null;
-        let cropper = null;
+        let currentLoggedUser = "";
+        let loginDateStr = "";
+        let expenseCounter = 0;
+
+        // Opsi Keterangan Pengeluaran
+        const expenseOptions = [
+            "Qris Gopay",
+            "Debit EDC",
+            "Transfer",
+            "Listrik toko",
+            "Modem Toko",
+            "Iuran Sampah",
+            "Iuran Air",
+            "Iuran RT",
+            "Keamanan/Ormas"
+        ];
+
+        // Format Date Indonesia (Contoh: "19 Agustus 2026")
+        function getIndonesianFormattedDate() {
+            const date = new Date();
+            const bulanIndo = [
+                "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+            ];
+            const tgl = date.getDate();
+            const bulan = bulanIndo[date.getMonth()];
+            const tahun = date.getFullYear();
+            return `${tgl} ${bulan} ${tahun}`;
+        }
+
+        // Pengaturan Login User & Agen
+        function handleLogin(e) {
+            e.preventDefault();
+            const idInput = document.getElementById('loginId').value.trim();
+            const passInput = document.getElementById('loginPass').value.trim();
+
+            if (idInput && passInput) {
+                currentLoggedUser = idInput;
+                loginDateStr = new Date().toDateString();
+
+                document.getElementById('displayUserAgent').textContent = currentLoggedUser;
+                document.getElementById('inTokAgen').value = currentLoggedUser;
+                document.getElementById('inTrfAgen').value = currentLoggedUser;
+                document.getElementById('inUnivAgen').value = currentLoggedUser;
+
+                // Set Outlet otomatis dari Username Login
+                document.getElementById('inRepOutlet').value = currentLoggedUser;
+                document.getElementById('outRepOutlet').textContent = currentLoggedUser;
+
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('dashboardSection').classList.remove('hidden');
+
+                // Update out display
+                updateTokenStruk();
+                updateTransferStruk();
+                updateUniversalStruk();
+            } else {
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        }
+
+        function handleLogout() {
+            currentLoggedUser = "";
+            loginDateStr = "";
+            document.getElementById('loginForm').reset();
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('dashboardSection').classList.add('hidden');
+            document.getElementById('loginError').classList.add('hidden');
+        }
+
+        // FUNGSI SWITCH TAB MENU
+        function switchTab(tabName) {
+            const modules = ['Token', 'Transfer', 'Voucher', 'Universal', 'Laporan'];
+            modules.forEach(mod => {
+                const modEl = document.getElementById('module' + mod);
+                const btnEl = document.getElementById('btnTab' + mod);
+                if (modEl && btnEl) {
+                    if (mod.toLowerCase() === tabName.toLowerCase()) {
+                        modEl.classList.remove('hidden');
+                        btnEl.className = "tab-btn p-3 rounded-xl border-2 font-bold flex items-center justify-center space-x-2 transition-all duration-200 bg-blue-600 border-blue-600 text-white shadow-md";
+                    } else {
+                        modEl.classList.add('hidden');
+                        btnEl.className = "tab-btn p-3 rounded-xl border-2 font-bold flex items-center justify-center space-x-2 transition-all duration-200 bg-white border-slate-200 text-slate-700 hover:border-blue-400";
+                    }
+                }
+            });
+        }
+
+        function parseCurrency(str) {
+            if (!str) return 0;
+            return parseInt(str.toString().replace(/[^0-9]/g, ''), 10) || 0;
+        }
+
+        function formatRupiah(value) {
+            let numberString = value.toString().replace(/[^,\d]/g, '');
+            return numberString.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        // MENAMBAHKAN BARIS PENGELUARAN DINAMIS (ADDITIONAL)
+        function addExpenseRow(defaultCategory = "Qris Gopay", defaultValue = "") {
+            expenseCounter++;
+            const id = expenseCounter;
+            const container = document.getElementById('expenseListContainer');
+
+            let optionsHtml = expenseOptions.map(opt => 
+                `<option value="${opt}" ${opt === defaultCategory ? 'selected' : ''}>${opt}</option>`
+            ).join('');
+
+            const rowDiv = document.createElement('div');
+            rowDiv.id = `expRow_${id}`;
+            rowDiv.className = 'grid grid-cols-12 gap-1 items-center bg-slate-50 p-1.5 rounded border border-slate-200 text-xs';
+            rowDiv.innerHTML = `
+                <div class="col-span-6">
+                    <select onchange="calculateReportTotals()" class="exp-cat w-full p-1 border border-slate-300 rounded text-[11px] font-semibold bg-white">
+                        ${optionsHtml}
+                    </select>
+                </div>
+                <div class="col-span-5">
+                    <input type="text" value="${defaultValue}" placeholder="Rp 0" oninput="this.value = formatRupiah(this.value); calculateReportTotals();" class="exp-val w-full p-1 border border-slate-300 rounded text-[11px]">
+                </div>
+                <div class="col-span-1 text-center">
+                    <button onclick="removeExpenseRow(${id})" class="text-rose-600 font-bold hover:text-rose-800 text-sm">✕</button>
+                </div>
+            `;
+
+            container.appendChild(rowDiv);
+            calculateReportTotals();
+        }
+
+        function removeExpenseRow(id) {
+            const row = document.getElementById(`expRow_${id}`);
+            if (row) {
+                row.remove();
+                calculateReportTotals();
+            }
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
 
-            function parseCurrency(str) {
-                if (!str) return 0;
-                return parseInt(str.toString().replace(/[^0-9]/g, ''), 10) || 0;
-            }
-
-            function formatRupiah(value) {
-                let numberString = value.toString().replace(/[^,\d]/g, '');
-                return numberString.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-            }
-
-            // MENGAMBIL WAKTU SEKARANG VERSI INDONESIA
+            // WAKTU INDONESIA REALTIME
             function getFormattedNow() {
                 const now = new Date();
                 const pad = (n) => n.toString().padStart(2, '0');
@@ -763,14 +1009,19 @@
                     const el = document.getElementById(id);
                     if (el) el.textContent = timeString;
                 });
+
+                if (currentLoggedUser) {
+                    const todayStr = new Date().toDateString();
+                    if (loginDateStr && loginDateStr !== todayStr) {
+                        alert('Hari telah berganti. Anda telah dikeluarkan dari sistem secara otomatis.');
+                        handleLogout();
+                    }
+                }
             }
             setInterval(updateAllPrintTimes, 1000);
             updateAllPrintTimes();
 
-            // Load footer promo tersimpan
             loadSavedFooters();
-
-            // Event listener realtime footer
             setupFooterListeners();
 
             function bindInput(inputId, outputId, prefix = '', suffix = '') {
@@ -783,27 +1034,28 @@
                 });
             }
 
+            // SET TANGGAL OTOMATIS (FORMAT INDONESIA)
+            const formattedIndoDate = getIndonesianFormattedDate();
+            const elTgl = document.getElementById('inRepTgl');
+            const outTgl = document.getElementById('outRepTgl');
+            if (elTgl) elTgl.value = formattedIndoDate;
+            if (outTgl) outTgl.textContent = "Tgl: " + formattedIndoDate;
+
             // ================= PARSER OTOMATIS BUKTI TRANSAKSI PLN =================
             const rawTokenText = document.getElementById('rawTokenText');
-            if (rawTokenText) {
-                rawTokenText.addEventListener('input', parseTokenReport);
-            }
+            if (rawTokenText) rawTokenText.addEventListener('input', parseTokenReport);
 
             function parseTokenReport() {
                 if (!rawTokenText) return;
                 const text = rawTokenText.value.trim();
                 if (!text) return;
 
-                const elAgen = document.getElementById('inTokAgen');
                 const elIdPel = document.getElementById('inTokIdPel');
                 const elNama = document.getElementById('inTokNama');
                 const elDaya = document.getElementById('inTokDaya');
                 const elKwh = document.getElementById('inTokKwh');
                 const elNominal = document.getElementById('inTokNominal');
                 const elKode = document.getElementById('inTokKode');
-
-                const agenMatch = text.match(/Agen\s+([^,]+)/i);
-                if (agenMatch && elAgen) elAgen.value = agenMatch[1].trim();
 
                 const idMatch = text.match(/(?:PLN\d*|IDPEL)?[\.\s]*(\d{11,12})/i);
                 if (idMatch && elIdPel) elIdPel.value = idMatch[1].trim();
@@ -866,7 +1118,6 @@
                 if (outKode) outKode.textContent = document.getElementById('inTokKode')?.value || '-';
             }
 
-            bindInput('inTokAgen', 'outTokAgen');
             bindInput('inTokIdPel', 'outTokIdPel');
             bindInput('inTokNama', 'outTokNama');
             bindInput('inTokDaya', 'outTokDaya');
@@ -885,22 +1136,16 @@
 
             // ================= PARSER OTOMATIS BUKTI TRANSFER =================
             const rawTrfText = document.getElementById('rawTrfText');
-            if (rawTrfText) {
-                rawTrfText.addEventListener('input', parseTransferReport);
-            }
+            if (rawTrfText) rawTrfText.addEventListener('input', parseTransferReport);
 
             function parseTransferReport() {
                 if (!rawTrfText) return;
                 const text = rawTrfText.value.trim();
                 if (!text) return;
 
-                const elAgen = document.getElementById('inTrfAgen');
                 const elBankSelect = document.getElementById('inTrfBank');
                 const elRek = document.getElementById('inTrfRek');
                 const elNama = document.getElementById('inTrfNama');
-
-                const agenMatch = text.match(/Agen\s+([^,]+)/i);
-                if (agenMatch && elAgen) elAgen.value = agenMatch[1].trim();
 
                 const pblMatch = text.match(/Pembelian\s+([A-Za-z0-9]+)\.(\d+)\s+Hrg=/i);
                 if (pblMatch) {
@@ -977,7 +1222,6 @@
                 calculateTransferTotal();
             }
 
-            bindInput('inTrfAgen', 'outTrfAgen');
             bindInput('inTrfRek', 'outTrfRek');
             bindInput('inTrfNama', 'outTrfNama');
 
@@ -1056,30 +1300,21 @@
                 if (el) el.addEventListener('input', updateVoucher);
             });
 
-            // ================= LOGIKA LOGIKA MODUL 4: PRINT UNIVERSAL =================
+            // ================= MODUL PRINT UNIVERSAL =================
             const rawUnivText = document.getElementById('rawUnivText');
-            if (rawUnivText) {
-                rawUnivText.addEventListener('input', parseUniversalReport);
-            }
+            if (rawUnivText) rawUnivText.addEventListener('input', parseUniversalReport);
 
             function parseUniversalReport() {
                 if (!rawUnivText) return;
                 const text = rawUnivText.value.trim();
                 if (!text) return;
 
-                const elAgen = document.getElementById('inUnivAgen');
                 const elKodePbl = document.getElementById('inUnivKodePbl');
                 const elHarga = document.getElementById('inUnivHarga');
 
-                // Baca KODE AGEN
-                const agenMatch = text.match(/Agen\s+([^,]+)/i);
-                if (agenMatch && elAgen) elAgen.value = agenMatch[1].trim();
-
-                // Baca KODE PEMBELIAN (Contoh: Pembelian RE20E.089602035849)
                 const pblMatch = text.match(/Pembelian\s+([A-Za-z0-9]+)\./i) || text.match(/Pembelian\s+([A-Za-z0-9]+)/i);
                 if (pblMatch && elKodePbl) elKodePbl.value = pblMatch[1].trim();
 
-                // Baca HARGA
                 const hrgMatch = text.match(/Hrg\s*=\s*(\d+)/i) || text.match(/Hrg\s*(\d+)/i);
                 if (hrgMatch && elHarga) elHarga.value = formatRupiah(hrgMatch[1].trim());
 
@@ -1101,7 +1336,6 @@
                 }
             }
 
-            bindInput('inUnivAgen', 'outUnivAgen');
             bindInput('inUnivKodePbl', 'outUnivKodePbl');
             
             const inUnivKategori = document.getElementById('inUnivKategori');
@@ -1115,35 +1349,24 @@
                 });
             }
 
-            // ================= LOGIKA MODUL 5: PRINT LAPORAN (UPLOAD & CROP) =================
-            const uploadImage = document.getElementById('uploadImage');
-            const imageToCrop = document.getElementById('imageToCrop');
-            const cropperContainer = document.getElementById('cropperContainer');
+            // ================= LOGIKA MODUL PRINT LAPORAN =================
+            bindInput('inRepNama', 'outRepNama', 'Nama: ');
+            bindInput('inRepShift', 'outRepShift');
 
-            if (uploadImage) {
-                uploadImage.addEventListener('change', function (e) {
-                    const files = e.target.files;
-                    if (files && files.length > 0) {
-                        const file = files[0];
-                        const reader = new FileReader();
-                        reader.onload = function (e) {
-                            imageToCrop.src = e.target.result;
-                            cropperContainer.classList.remove('hidden');
-
-                            if (cropper) {
-                                cropper.destroy();
-                            }
-
-                            cropper = new Cropper(imageToCrop, {
-                                viewMode: 1,
-                                autoCropArea: 1,
-                                responsive: true
-                            });
-                        };
-                        reader.readAsDataURL(file);
-                    }
+            // Format otomatis & kalkulasi laporan
+            document.querySelectorAll('.rep-calc').forEach(el => {
+                el.addEventListener('input', (e) => {
+                    e.target.value = formatRupiah(e.target.value);
+                    calculateReportTotals();
                 });
-            }
+            });
+
+            document.querySelectorAll('.cash-calc').forEach(el => {
+                el.addEventListener('input', calculateReportTotals);
+            });
+
+            // Inisialisasi Pengeluaran Awal Default
+            addExpenseRow("Qris Gopay", "284.000");
 
             // Initial Update
             updateTokenStruk();
@@ -1152,21 +1375,80 @@
             updateUniversalStruk();
         });
 
-        // PANGKAS & TERAPKAN GAMBAR
-        function cropAndApply() {
-            if (!cropper) return;
-            const canvas = cropper.getCroppedCanvas();
-            if (canvas) {
-                const croppedDataUrl = canvas.toDataURL();
-                const croppedResultImage = document.getElementById('croppedResultImage');
-                const emptyState = document.getElementById('emptyImageState');
-                const wrapper = document.getElementById('previewImageWrapper');
+        // KALKULASI LAPORAN EXCEL VIRTUAL
+        function calculateReportTotals() {
+            // 1. Pendapatan
+            const valElektrik = parseCurrency(document.getElementById('inRepElektrik')?.value);
+            const valFisikQty = parseCurrency(document.getElementById('inRepFisik')?.value);
+            const valSaldoAgen = parseCurrency(document.getElementById('inRepSaldoAgen')?.value);
+            const valTrxLain = parseCurrency(document.getElementById('inRepTrxLain')?.value);
+            const totPendapatan = valElektrik + valSaldoAgen + valTrxLain;
 
-                if (croppedResultImage) croppedResultImage.src = croppedDataUrl;
-                if (emptyState) emptyState.classList.add('hidden');
-                if (wrapper) wrapper.classList.remove('hidden');
+            document.getElementById('outRepElektrik').textContent = 'Rp ' + formatRupiah(valElektrik);
+            document.getElementById('outRepFisik').textContent = valFisikQty || '0';
+            document.getElementById('outRepSaldoAgen').textContent = 'Rp ' + formatRupiah(valSaldoAgen);
+            document.getElementById('outRepTrxLain').textContent = 'Rp ' + formatRupiah(valTrxLain);
+            document.getElementById('outTotPendapatan').textContent = 'Rp ' + formatRupiah(totPendapatan);
 
-                alert('Gambar berhasil dipangkas dan diterapkan ke preview!');
+            // 2. Pengeluaran Dinamis
+            let totPengeluaran = 0;
+            const outExpenseList = document.getElementById('outExpenseList');
+            if (outExpenseList) outExpenseList.innerHTML = '';
+
+            const expRows = document.querySelectorAll('#expenseListContainer > div');
+            expRows.forEach(row => {
+                const cat = row.querySelector('.exp-cat')?.value || 'Pengeluaran';
+                const val = parseCurrency(row.querySelector('.exp-val')?.value);
+                totPengeluaran += val;
+
+                if (outExpenseList) {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'flex justify-between';
+                    itemDiv.innerHTML = `<span>${cat}:</span><span>Rp ${formatRupiah(val)}</span>`;
+                    outExpenseList.appendChild(itemDiv);
+                }
+            });
+
+            document.getElementById('outTotPengeluaran').textContent = 'Rp ' + formatRupiah(totPengeluaran);
+
+            // Total Penjualan
+            const netPenjualan = totPendapatan - totPengeluaran;
+            document.getElementById('outNetPenjualan').textContent = 'Rp ' + formatRupiah(netPenjualan);
+
+            // 3. Fisik Uang
+            const cashList = [
+                { q: 'qty100k', outQ: 'outQ100', outV: 'outV100', nominal: 100000 },
+                { q: 'qty50k', outQ: 'outQ50', outV: 'outV50', nominal: 50000 },
+                { q: 'qty20k', outQ: 'outQ20', outV: 'outV20', nominal: 20000 },
+                { q: 'qty10k', outQ: 'outQ10', outV: 'outV10', nominal: 10000 },
+                { q: 'qty5k', outQ: 'outQ5', outV: 'outV5', nominal: 5000 },
+                { q: 'qty2k', outQ: 'outQ2', outV: 'outV2', nominal: 2000 },
+                { q: 'qty1k', outQ: 'outQ1', outV: 'outV1', nominal: 1000 }
+            ];
+
+            let totFisik = 0;
+            cashList.forEach(item => {
+                const qty = parseInt(document.getElementById(item.q)?.value, 10) || 0;
+                const sub = qty * item.nominal;
+                totFisik += sub;
+                document.getElementById(item.outQ).textContent = qty;
+                document.getElementById(item.outV).textContent = 'Rp ' + formatRupiah(sub);
+            });
+
+            const valReceh = parseCurrency(document.getElementById('valReceh')?.value);
+            totFisik += valReceh;
+            document.getElementById('outVReceh').textContent = 'Rp ' + formatRupiah(valReceh);
+            document.getElementById('outTotFisik').textContent = 'Rp ' + formatRupiah(totFisik);
+
+            // Plus / Minus
+            const plusMinus = totFisik - netPenjualan;
+            const elPlusMinus = document.getElementById('outPlusMinus');
+            if (plusMinus < 0) {
+                elPlusMinus.textContent = '-Rp ' + formatRupiah(Math.abs(plusMinus));
+                elPlusMinus.className = "text-rose-600 font-bold";
+            } else {
+                elPlusMinus.textContent = 'Rp ' + formatRupiah(plusMinus);
+                elPlusMinus.className = "text-emerald-700 font-bold";
             }
         }
 
@@ -1270,33 +1552,36 @@
             }
         }
 
-        async function sendToPrinter(textData) {
+        async function sendRawToPrinter(uint8ArrayData) {
             if (!bluetoothGattCharacteristic) {
                 alert("Silakan hubungkan printer Bluetooth terlebih dahulu via tombol di kanan atas.");
                 return;
             }
 
             try {
-                const ESC = '\x1B';
-                const GS = '\x1D';
-                
-                let init = ESC + '@'; 
-                let alignLeft = ESC + 'a' + '\x00';
-                
-                let printBuffer = init + alignLeft + textData + '\n\n\n\n' + GS + 'V' + '\x41' + '\x03'; 
-
-                const encoder = new TextEncoder();
-                const data = encoder.encode(printBuffer);
-
                 const chunkSize = 100;
-                for (let i = 0; i < data.length; i += chunkSize) {
-                    const chunk = data.slice(i, i + chunkSize);
+                for (let i = 0; i < uint8ArrayData.length; i += chunkSize) {
+                    const chunk = uint8ArrayData.slice(i, i + chunkSize);
                     await bluetoothGattCharacteristic.writeValue(chunk);
                 }
-
             } catch (err) {
                 alert("Gagal mencetak: " + err.message);
             }
+        }
+
+        async function sendToPrinter(textData) {
+            const ESC = '\x1B';
+            const GS = '\x1D';
+            
+            let init = ESC + '@'; 
+            let alignLeft = ESC + 'a' + '\x00';
+            
+            let printBuffer = init + alignLeft + textData + '\n\n\n\n' + GS + 'V' + '\x41' + '\x03'; 
+
+            const encoder = new TextEncoder();
+            const data = encoder.encode(printBuffer);
+
+            await sendRawToPrinter(data);
         }
 
         function printBluetooth(type) {
@@ -1328,6 +1613,8 @@
                 str += sep;
                 str += (document.getElementById('outTokPrintTime')?.textContent || '') + "\n";
 
+                sendToPrinter(str);
+
             } else if (type === 'transfer') {
                 str += "          POINN PULSA          \n";
                 str += "      BUKTI TRANSFER BANK      \n";
@@ -1352,6 +1639,8 @@
                 str += sep;
                 str += (document.getElementById('outTrfPrintTime')?.textContent || '') + "\n";
 
+                sendToPrinter(str);
+
             } else if (type === 'voucher') {
                 str += "          POINN PULSA          \n";
                 str += " " + (document.getElementById('outProvider')?.textContent || '') + " - Voucher Fisik \n";
@@ -1371,6 +1660,8 @@
                 }
                 str += sep;
                 str += (document.getElementById('outPrintTime')?.textContent || '') + "\n";
+
+                sendToPrinter(str);
 
             } else if (type === 'universal') {
                 str += "          POINN PULSA          \n";
@@ -1392,57 +1683,54 @@
                 str += sep;
                 str += (document.getElementById('outUnivPrintTime')?.textContent || '') + "\n";
 
+                sendToPrinter(str);
+
             } else if (type === 'laporan') {
-                alert("Untuk cetak Gambar Laporan via printer Web/Thermal, silakan gunakan tombol 'Cetak Web Laporan'.");
-                window.print();
-                return;
+                str += "          POINN PULSA          \n";
+                str += "        LAPORAN PENJUALAN      \n";
+                str += sep;
+                str += (document.getElementById('outRepNama')?.textContent || '') + "\n";
+                str += (document.getElementById('outRepTgl')?.textContent || '') + "\n";
+                str += "Outlet : " + (document.getElementById('outRepOutlet')?.textContent || '-') + "\n";
+                str += "Shift  : " + (document.getElementById('inRepShift')?.value || '-') + "\n";
+                str += sep;
+                str += "1. PENDAPATAN\n";
+                str += "Elektrik   : " + (document.getElementById('outRepElektrik')?.textContent || 'Rp 0') + "\n";
+                str += "Fisik (Qty): " + (document.getElementById('outRepFisik')?.textContent || '0') + "\n";
+                str += "Saldo Agen : " + (document.getElementById('outRepSaldoAgen')?.textContent || 'Rp 0') + "\n";
+                str += "Trx Lain   : " + (document.getElementById('outRepTrxLain')?.textContent || 'Rp 0') + "\n";
+                str += "TOT PENDAPATAN: " + (document.getElementById('outTotPendapatan')?.textContent || 'Rp 0') + "\n";
+                str += sep;
+                str += "2. PENGELUARAN\n";
+
+                const expRows = document.querySelectorAll('#expenseListContainer > div');
+                expRows.forEach(row => {
+                    const cat = row.querySelector('.exp-cat')?.value || 'Pengeluaran';
+                    const val = row.querySelector('.exp-val')?.value || '0';
+                    str += `${cat.padEnd(11, ' ')}: Rp ${val}\n`;
+                });
+
+                str += "TOT PENGELUARAN: " + (document.getElementById('outTotPengeluaran')?.textContent || 'Rp 0') + "\n";
+                str += sep;
+                str += "TOT PENJUALAN  : " + (document.getElementById('outNetPenjualan')?.textContent || 'Rp 0') + "\n";
+                str += sep;
+                str += "3. RINCIAN FISIK UANG\n";
+                str += `100.000 x ${(document.getElementById('outQ100')?.textContent || '0').padEnd(3)}: ${document.getElementById('outV100')?.textContent || 'Rp 0'}\n`;
+                str += `50.000  x ${(document.getElementById('outQ50')?.textContent || '0').padEnd(3)}: ${document.getElementById('outV50')?.textContent || 'Rp 0'}\n`;
+                str += `20.000  x ${(document.getElementById('outQ20')?.textContent || '0').padEnd(3)}: ${document.getElementById('outV20')?.textContent || 'Rp 0'}\n`;
+                str += `10.000  x ${(document.getElementById('outQ10')?.textContent || '0').padEnd(3)}: ${document.getElementById('outV10')?.textContent || 'Rp 0'}\n`;
+                str += `5.000   x ${(document.getElementById('outQ5')?.textContent || '0').padEnd(3)}: ${document.getElementById('outV5')?.textContent || 'Rp 0'}\n`;
+                str += `2.000   x ${(document.getElementById('outQ2')?.textContent || '0').padEnd(3)}: ${document.getElementById('outV2')?.textContent || 'Rp 0'}\n`;
+                str += `1.000   x ${(document.getElementById('outQ1')?.textContent || '0').padEnd(3)}: ${document.getElementById('outV1')?.textContent || 'Rp 0'}\n`;
+                str += `Receh         : ${document.getElementById('outVReceh')?.textContent || 'Rp 0'}\n`;
+                str += "TOTAL FISIK    : " + (document.getElementById('outTotFisik')?.textContent || 'Rp 0') + "\n";
+                str += sep;
+                str += "PLUS MINUS     : " + (document.getElementById('outPlusMinus')?.textContent || 'Rp 0') + "\n";
+                str += sep;
+                str += (document.getElementById('outLapPrintTime')?.textContent || '') + "\n";
+
+                sendToPrinter(str);
             }
-
-            sendToPrinter(str);
-        }
-
-        function switchTab(tabName) {
-            document.querySelectorAll('.module-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.className = "tab-btn p-3 rounded-xl border-2 font-bold flex items-center justify-center space-x-2 transition-all duration-200 bg-white border-slate-200 text-slate-700 hover:border-blue-400";
-            });
-
-            const targetModule = document.getElementById(
-                tabName === 'token' ? 'moduleToken' : 
-                tabName === 'transfer' ? 'moduleTransfer' : 
-                tabName === 'voucher' ? 'moduleVoucher' : 
-                tabName === 'universal' ? 'moduleUniversal' : 'moduleLaporan'
-            );
-            const targetBtn = document.getElementById(
-                tabName === 'token' ? 'btnTabToken' : 
-                tabName === 'transfer' ? 'btnTabTransfer' : 
-                tabName === 'voucher' ? 'btnTabVoucher' : 
-                tabName === 'universal' ? 'btnTabUniversal' : 'btnTabLaporan'
-            );
-
-            if (targetModule) targetModule.classList.remove('hidden');
-            if (targetBtn) targetBtn.className = "tab-btn p-3 rounded-xl border-2 font-bold flex items-center justify-center space-x-2 transition-all duration-200 bg-blue-600 border-blue-600 text-white shadow-md";
-        }
-
-        function handleLogin(e) {
-            e.preventDefault();
-            const id = document.getElementById('loginId')?.value.trim();
-            const pass = document.getElementById('loginPass')?.value.trim();
-
-            if (id === "POINNPULSA" && pass === "admin123") {
-                document.getElementById('loginSection')?.classList.add('hidden');
-                document.getElementById('dashboardSection')?.classList.remove('hidden');
-                document.getElementById('loginError')?.classList.add('hidden');
-            } else {
-                document.getElementById('loginError')?.classList.remove('hidden');
-            }
-        }
-
-        function handleLogout() {
-            document.getElementById('dashboardSection')?.classList.add('hidden');
-            document.getElementById('loginSection')?.classList.remove('hidden');
-            const loginForm = document.getElementById('loginForm');
-            if (loginForm) loginForm.reset();
         }
     </script>
 </body>
