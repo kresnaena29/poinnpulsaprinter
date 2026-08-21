@@ -90,13 +90,13 @@
             </div>
 
             <div id="loginError" class="hidden mb-4 p-3 bg-rose-100 border border-rose-300 text-rose-700 text-xs rounded-lg font-semibold text-center">
-                ID atau Password salah!
+                Username atau Password salah!
             </div>
 
             <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Username / Kode Toko</label>
-                    <input type="text" id="loginId" required placeholder="Contoh: POINNPULSA_1" class="w-full p-3 border border-slate-300 rounded-lg text-sm font-semibold focus:ring-2 focus:ring-blue-500 outline-none">
+                    <input type="text" id="loginId" required placeholder="Contoh: POINNPULSA_01" class="w-full p-3 border border-slate-300 rounded-lg text-sm font-semibold focus:ring-2 focus:ring-blue-500 outline-none">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Password</label>
@@ -878,13 +878,14 @@
             return `${tgl} ${bulan} ${tahun}`;
         }
 
-        // Pengaturan Login User & Agen
+        // Pengaturan Login User & Agen (Password diperbarui ke 'admin123')
         function handleLogin(e) {
             e.preventDefault();
             const idInput = document.getElementById('loginId').value.trim();
             const passInput = document.getElementById('loginPass').value.trim();
 
-            if (idInput && passInput) {
+            if (passInput === "admin123") {
+                document.getElementById('loginError').classList.add('hidden');
                 currentLoggedUser = idInput;
                 loginDateStr = new Date().toDateString();
 
