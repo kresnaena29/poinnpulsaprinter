@@ -70,47 +70,131 @@
     </style>
 </head>
 <body class="bg-slate-100 min-h-screen text-slate-800 font-sans">
-
-    <!-- ================= 1. HALAMAN LOGIN ================= -->
-    <div id="loginSection" class="min-h-screen flex items-center justify-center p-4">
-        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-200">
-            <div class="text-center mb-6">
-                <!-- LOGO LINGKARAN POINNPULSA MONOKROM -->
-                <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-black border-4 border-white p-1 shadow-md mb-2 logo-circle">
-                    <div class="flex items-center text-left leading-none font-black font-sans tracking-tight">
-                        <span class="text-white text-4xl font-black leading-none">P</span>
-                        <div class="flex flex-col -ml-0.5">
-                            <span class="text-white logo-text-lime text-sm font-black leading-tight">OINN</span>
-                            <span class="text-white text-sm font-black leading-tight">ULSA</span>
-                        </div>
+  
+  
+  <!-- ================= 1. HALAMAN LOGIN ================= -->
+<div id="loginSection" class="min-h-screen flex items-center justify-center p-4 bg-slate-50">
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-200">
+        <div class="text-center mb-6">
+            <!-- LOGO LINGKARAN POINNPULSA MONOKROM -->
+            <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-black border-4 border-white p-1 shadow-md mb-2 logo-circle">
+                <div class="flex items-center text-left leading-none font-black font-sans tracking-tight">
+                    <span class="text-white text-4xl font-black leading-none">P</span>
+                    <div class="flex flex-col -ml-0.5">
+                        <span class="text-white logo-text-lime text-sm font-black leading-tight">OINN</span>
+                        <span class="text-white text-sm font-black leading-tight">ULSA</span>
                     </div>
                 </div>
-                <h1 class="text-2xl font-black text-slate-900">StrukPrint <span class="text-blue-600">Online</span></h1>
-                <p class="text-xs text-slate-500">Masuk untuk mengakses sistem pencetakan</p>
             </div>
-
-            <div id="loginError" class="hidden mb-4 p-3 bg-rose-100 border border-rose-300 text-rose-700 text-xs rounded-lg font-semibold text-center">
-                Username atau Password salah!
-            </div>
-
-            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Username / Kode Toko</label>
-                    <input type="text" id="loginId" required placeholder="Contoh: POINNPULSA_01" class="w-full p-3 border border-slate-300 rounded-lg text-sm font-semibold focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Password</label>
-                    <input type="password" id="loginPass" required placeholder="••••••••" class="w-full p-3 border border-slate-300 rounded-lg text-sm font-semibold focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-md transition-all text-sm uppercase tracking-wider">
-                    Masuk ke Sistem
-                </button>
-            </form>
+            <h1 class="text-2xl font-black text-slate-900">StrukPrint <span class="text-blue-600">Online</span></h1>
+            <p class="text-xs text-slate-500">Masuk untuk mengakses sistem pencetakan</p>
         </div>
+
+        <div id="loginError" class="hidden mb-4 p-3 bg-rose-100 border border-rose-300 text-rose-700 text-xs rounded-lg font-semibold text-center">
+            Username atau Password salah!
+        </div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Username / Kode Toko</label>
+                <input type="text" id="loginId" required placeholder="Contoh: POINNPULSA_01" class="w-full p-3 border border-slate-300 rounded-lg text-sm font-semibold focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Password</label>
+                <input type="password" id="loginPass" required placeholder="••••••••" class="w-full p-3 border border-slate-300 rounded-lg text-sm font-semibold focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-md transition-all text-sm uppercase tracking-wider">
+                Masuk ke Sistem
+            </button>
+        </form>
     </div>
+</div>
 
+<!-- ================= LOGIKA JAVASCRIPT ================= -->
+<script>
+    // Fungsi untuk mendapatkan format tanggal hari ini (YYYY-MM-DD)
+    function getTodayString() {
+        const today = new Date();
+        return today.toISOString().split('T')[0];
+    }
 
-    <!-- ================= 2. DASHBOARD & FITUR CETAK ================= -->
+    // Fungsi login
+    function handleLogin(event) {
+        event.preventDefault();
+        
+        const username = document.getElementById('loginId').value;
+        const password = document.getElementById('loginPass').value;
+        const errorDiv = document.getElementById('loginError');
+
+        // Contoh validasi sederhana
+        if (username && password) {
+            // Simpan status session & tanggal login hari ini
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('loginDate', getTodayString());
+            
+            errorDiv.classList.add('hidden');
+            
+            // Pengalihan halaman / tampilkan dashboard Anda di sini
+            alert('Login berhasil!');
+            checkAuthStatus();
+        } else {
+            errorDiv.classList.remove('hidden');
+        }
+    }
+
+    // Fungsi logout
+    function handleLogout() {
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('loginDate');
+        
+        // Tampilkan kembali form login
+        document.getElementById('loginSection').classList.remove('hidden');
+        
+        // Sembunyikan bagian dashboard jika ada
+        const dashboard = document.getElementById('dashboardSection');
+        if (dashboard) dashboard.classList.add('hidden');
+    }
+
+    // Fungsi pengecekan pergantian hari (Reset pada 00.00)
+    function checkMidnightReset() {
+        const isLoggedIn = localStorage.getItem('isLoggedIn');
+        const loginDate = localStorage.getItem('loginDate');
+        const currentDate = getTodayString();
+
+        // Jika user sedang login dan tanggal sistem saat ini berbeda dengan tanggal login
+        if (isLoggedIn === 'true' && loginDate !== currentDate) {
+            alert('Sesi Anda telah berakhir karena pergantian hari. Silakan login kembali.');
+            handleLogout();
+        }
+    }
+
+    // Fungsi verifikasi status login awal
+    function checkAuthStatus() {
+        const isLoggedIn = localStorage.getItem('isLoggedIn');
+        
+        if (isLoggedIn === 'true') {
+            checkMidnightReset();
+            // Sembunyikan login jika session masih valid pada hari yang sama
+            if (localStorage.getItem('isLoggedIn') === 'true') {
+                document.getElementById('loginSection').classList.add('hidden');
+                const dashboard = document.getElementById('dashboardSection');
+                if (dashboard) dashboard.classList.remove('hidden');
+            }
+        } else {
+            document.getElementById('loginSection').classList.remove('hidden');
+        }
+    }
+
+    // Jalankan pengecekan saat halaman dimuat
+    document.addEventListener('DOMContentLoaded', () => {
+        checkAuthStatus();
+
+        // Cek secara otomatis setiap 10 detik untuk menangkap momen pergantian jam 00:00 tepat waktu
+        setInterval(checkMidnightReset, 10000);
+    });
+</script>
+
+<!-- ================= 2. DASHBOARD & FITUR CETAK ================= -->
     <div id="dashboardSection" class="hidden min-h-screen p-4 md:p-8">
         
         <header class="max-w-6xl mx-auto bg-slate-900 text-white rounded-xl p-4 mb-6 shadow-md flex justify-between items-center no-print">
@@ -175,7 +259,7 @@
                             <span class="bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center mr-2">1</span>
                             Tempelkan Bukti Transaksi
                         </h2>
-                        <textarea id="rawTokenText" rows="3" placeholder="Tempelkan teks laporan transaksi di sini..." class="w-full p-2.5 border border-blue-300 rounded-lg text-xs font-mono bg-white outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                        <textarea id="rawTokenText" rows="3" placeholder="Tempelkan report transaksi di sini..." class="w-full p-2.5 border border-blue-300 rounded-lg text-xs font-mono bg-white outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                         <p class="text-[11px] text-blue-700 font-medium">*Data ID, Nama, Daya, kWh, Harga, & Token otomatis terisi.</p>
                     </div>
 
@@ -190,7 +274,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">ID PLN / No Meter</label>
-                        <input type="text" id="inTokIdPel" placeholder="-" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="text" id="inTokIdPel" placeholder="0" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nama Pelanggan</label>
@@ -198,11 +282,11 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Tarif / Daya</label>
-                        <input type="text" id="inTokDaya" placeholder="-" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="text" id="inTokDaya" placeholder="0" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Jumlah kWh</label>
-                        <input type="text" id="inTokKwh" placeholder="-" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="text" id="inTokKwh" placeholder="0" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nominal Pembelian (Rp)</label>
@@ -294,7 +378,7 @@
                             <span class="bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center mr-2">1</span>
                             Tempelkan Bukti Transaksi
                         </h2>
-                        <textarea id="rawTrfText" rows="3" placeholder="Tempel teks laporan transaksi di sini..." class="w-full p-2.5 border border-blue-300 rounded-lg text-xs font-mono bg-white outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                        <textarea id="rawTrfText" rows="3" placeholder="Tempelkan report transaksi di sini..." class="w-full p-2.5 border border-blue-300 rounded-lg text-xs font-mono bg-white outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                         <p class="text-[11px] text-blue-700 font-medium">*Bank, No. Rekening, & Nama otomatis terisi.</p>
                     </div>
 
@@ -450,22 +534,26 @@
                         </select>
                     </div>
                     <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Kode Agen (Terkunci)</label>
+                        <input type="text" id="inUnivAgen" readonly class="w-full p-2.5 border border-slate-200 bg-slate-100 text-slate-500 rounded-lg text-sm font-bold outline-none cursor-not-allowed">
+                    </div>
+                    <div>
                         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">1. Fill Jumlah Kuota (GB)</label>
-                        <input type="number" id="inKuota" value="10" min="1" class="w-full p-2.5 border border-blue-400 bg-blue-50 rounded-lg text-sm font-bold text-blue-900 focus:ring-2 focus:ring-blue-500 outline-none">
+                        <input type="number" id="inKuota" placeholder="0"  min="1" class="w-full p-2.5 border border-blue-400 bg-blue-50 rounded-lg text-sm font-bold text-blue-900 focus:ring-2 focus:ring-blue-500 outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">2. Fill Masa Aktif (Hari)</label>
-                        <input type="number" id="inMasaAktif" value="30" min="1" class="w-full p-2.5 border border-blue-400 bg-blue-50 rounded-lg text-sm font-bold text-blue-900 focus:ring-2 focus:ring-blue-500 outline-none">
+                        <input type="number" id="inMasaAktif" placeholder="0"  min="1" class="w-full p-2.5 border border-blue-400 bg-blue-50 rounded-lg text-sm font-bold text-blue-900 focus:ring-2 focus:ring-blue-500 outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nominal / Harga (Rp)</label>
-                        <input type="text" id="inHarga" value="60.000" placeholder="0" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold focus:ring-2 focus:ring-blue-500 outline-none">
+                        <input type="text" id="inHarga" placeholder="0"  placeholder="0" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold focus:ring-2 focus:ring-blue-500 outline-none">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">3. Fill Colom Kode Voucher / Dial</label>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">3. Fill Kolom Kode Voucher / Dial</label>
                         <div class="flex rounded-lg border border-blue-400 bg-blue-50 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500">
                             <span id="prefixDial" class="bg-slate-200 text-slate-700 font-mono font-bold text-sm px-3 py-2.5 border-r border-slate-300 flex items-center select-none">*133*</span>
-                            <input type="text" id="inKodeSisa" value="30421005451161822" placeholder="Sisa angka..." class="w-full p-2.5 bg-transparent text-sm font-mono font-bold text-blue-900 outline-none">
+                            <input type="text" id="inKodeSisa"  placeholder="Tempelkan Kode Voucher disini..." class="w-full p-2.5 bg-transparent text-sm font-mono font-bold text-blue-900 outline-none">
                             <span class="bg-slate-100 text-slate-500 font-mono font-bold text-sm px-2.5 py-2.5 border-l border-slate-200 flex items-center select-none">#</span>
                         </div>
                     </div>
@@ -560,7 +648,7 @@
                             <span class="bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center mr-2">1</span>
                             Tempelkan Report Transaksi
                         </h2>
-                        <textarea id="rawUnivText" rows="3" placeholder="Contoh: >>ALL TRANSAKSI LANCARRR<< Agen POIN PULSA_1, Pembelian RE20E.089602035849 Hrg=23000 telah berhasil. Saldo Rp.(Awal 627253 Akhir 604253)" class="w-full p-2.5 border border-blue-300 rounded-lg text-xs font-mono bg-white outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                        <textarea id="rawUnivText" rows="3" placeholder="Tempelkan report transaksi di sini..." class="w-full p-2.5 border border-blue-300 rounded-lg text-xs font-mono bg-white outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                         <p class="text-[11px] text-blue-700 font-medium">*Kode Pembelian & Nominal terisi otomatis saat ditempel.</p>
                     </div>
 
@@ -575,7 +663,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Kode Pembelian</label>
-                        <input type="text" id="inUnivKodePbl" placeholder="RE20E" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="text" id="inUnivKodePbl" placeholder="Kode produk" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Kategori Produk</label>
@@ -591,7 +679,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nominal / Harga (Rp)</label>
-                        <input type="text" id="inUnivHarga" placeholder="23.000" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="text" id="inUnivHarga" placeholder="0" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
 
                     <!-- FOOTER PROMO -->
@@ -671,7 +759,7 @@
                         <div class="grid grid-cols-2 gap-2">
                             <div>
                                 <label class="block text-[11px] font-bold text-slate-600">Nama Staff</label>
-                                <input type="text" id="inRepNama" value="RIDWAN KUSWARA" class="w-full p-2 border border-slate-300 rounded text-xs font-semibold">
+                                <input type="text" id="inRepNama" placeholder="Nama lengkap"  class="w-full p-2 border border-slate-300 rounded text-xs font-semibold">
                             </div>
                             <div>
                                 <label class="block text-[11px] font-bold text-slate-600">Tanggal (Terkunci)</label>
@@ -683,7 +771,7 @@
                             </div>
                             <div>
                                 <label class="block text-[11px] font-bold text-slate-600">Shift</label>
-                                <input type="text" id="inRepShift" value="Shift 2" class="w-full p-2 border border-slate-300 rounded text-xs font-semibold">
+                                <input type="text" id="inRepShift" value="Shift 1" class="w-full p-2 border border-slate-300 rounded text-xs font-semibold">
                             </div>
                         </div>
 
@@ -691,11 +779,11 @@
                         <div class="grid grid-cols-2 gap-2 text-xs">
                             <div>
                                 <label class="block text-[10px] text-slate-600">Elektrik (Rp)</label>
-                                <input type="text" id="inRepElektrik" value="6.907.000" class="rep-calc w-full p-1.5 border border-slate-300 rounded">
+                                <input type="text" id="inRepElektrik" placeholder="0"  class="rep-calc w-full p-1.5 border border-slate-300 rounded">
                             </div>
                             <div>
                                 <label class="block text-[10px] text-slate-600">Fisik (Qty)</label>
-                                <input type="text" id="inRepFisik" value="45" class="rep-calc w-full p-1.5 border border-slate-300 rounded">
+                                <input type="text" id="inRepFisik" placeholder="0"  class="rep-calc w-full p-1.5 border border-slate-300 rounded">
                             </div>
                             <div>
                                 <label class="block text-[10px] text-slate-600">Saldo Agen (Rp)</label>
@@ -722,13 +810,13 @@
 
                         <h2 class="text-xs font-bold text-blue-900 uppercase bg-blue-50 p-2 rounded border border-blue-200 mt-2">3. Rincian Fisik Uang (Lembar/Pcs)</h2>
                         <div class="grid grid-cols-2 gap-2 text-xs">
-                            <div><label class="block text-[10px] text-slate-600">Rp 100.000</label><input type="number" id="qty100k" value="30" class="cash-calc w-full p-1.5 border border-slate-300 rounded"></div>
-                            <div><label class="block text-[10px] text-slate-600">Rp 50.000</label><input type="number" id="qty50k" value="18" class="cash-calc w-full p-1.5 border border-slate-300 rounded"></div>
-                            <div><label class="block text-[10px] text-slate-600">Rp 20.000</label><input type="number" id="qty20k" value="1" class="cash-calc w-full p-1.5 border border-slate-300 rounded"></div>
-                            <div><label class="block text-[10px] text-slate-600">Rp 10.000</label><input type="number" id="qty10k" value="3" class="cash-calc w-full p-1.5 border border-slate-300 rounded"></div>
-                            <div><label class="block text-[10px] text-slate-600">Rp 5.000</label><input type="number" id="qty5k" value="1" class="cash-calc w-full p-1.5 border border-slate-300 rounded"></div>
-                            <div><label class="block text-[10px] text-slate-600">Rp 2.000</label><input type="number" id="qty2k" value="3" class="cash-calc w-full p-1.5 border border-slate-300 rounded"></div>
-                            <div><label class="block text-[10px] text-slate-600">Rp 1.000</label><input type="number" id="qty1k" value="1" class="cash-calc w-full p-1.5 border border-slate-300 rounded"></div>
+                            <div><label class="block text-[10px] text-slate-600">Rp 100.000</label><input type="number" id="qty100k" placeholder="0"  class="cash-calc w-full p-1.5 border border-slate-300 rounded"></div>
+                            <div><label class="block text-[10px] text-slate-600">Rp 50.000</label><input type="number" id="qty50k" placeholder="0"  class="cash-calc w-full p-1.5 border border-slate-300 rounded"></div>
+                            <div><label class="block text-[10px] text-slate-600">Rp 20.000</label><input type="number" id="qty20k" placeholder="0"  class="cash-calc w-full p-1.5 border border-slate-300 rounded"></div>
+                            <div><label class="block text-[10px] text-slate-600">Rp 10.000</label><input type="number" id="qty10k" placeholder="0"  class="cash-calc w-full p-1.5 border border-slate-300 rounded"></div>
+                            <div><label class="block text-[10px] text-slate-600">Rp 5.000</label><input type="number" id="qty5k" placeholder="0"  class="cash-calc w-full p-1.5 border border-slate-300 rounded"></div>
+                            <div><label class="block text-[10px] text-slate-600">Rp 2.000</label><input type="number" id="qty2k" placeholder="0"  class="cash-calc w-full p-1.5 border border-slate-300 rounded"></div>
+                            <div><label class="block text-[10px] text-slate-600">Rp 1.000</label><input type="number" id="qty1k" placeholder="0"  class="cash-calc w-full p-1.5 border border-slate-300 rounded"></div>
                             <div><label class="block text-[10px] text-slate-600">Receh (Total Rp)</label><input type="text" id="valReceh" placeholder="0" class="rep-calc w-full p-1.5 border border-slate-300 rounded"></div>
                         </div>
                     </div>
@@ -1370,7 +1458,7 @@
             });
 
             // Inisialisasi Pengeluaran Awal Default
-            addExpenseRow("Qris Gopay", "284.000");
+            addExpenseRow("Qris Gopay", "0");
 
             // Initial Update
             updateTokenStruk();
@@ -1738,4 +1826,3 @@
         }
     </script>
 </body>
-</html>
